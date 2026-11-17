@@ -40,6 +40,8 @@ class StorefrontController extends Controller
             'price' => (float) $p->selling_price,
             'price_label' => rupiah($p->selling_price),
             'stock' => $p->current_stock,
+            'min_stock' => (int) $p->min_stock_threshold,
+            'critical' => $p->isCritical(),
             'fast' => $p->isFastMoving(),
             'image' => $p->imageUrl(),
             'initials' => $p->initials(),

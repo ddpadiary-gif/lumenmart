@@ -2,7 +2,7 @@
     @php $isAdmin = auth()->user()->isAdmin(); @endphp
 
     <!-- Top Banner & Quick Actions -->
-    <div class="flex flex-col justify-between gap-4 rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04] lg:flex-row lg:items-center">
+    <div class="flex flex-col justify-between gap-4 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04] lg:flex-row lg:items-center">
         <div>
             <span class="inline-flex items-center gap-2 rounded-full bg-[#f5f5f7] px-3 py-1 text-[11px] font-semibold text-[#1d1d1f]">
                 <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
@@ -28,7 +28,12 @@
                 <form
                     action="{{ route('backoffice.simulation.reset') }}"
                     method="POST"
-                    onsubmit="return confirm('Reset & generate ulang 30 produk, 800 transaksi 12 bulan, serta jalankan ulang Regresi Linear & Apriori?');"
+                    @submit.prevent="$dispatch('confirm-action', {
+                        form: $el,
+                        title: 'Reset & Generate Ulang Simulasi?',
+                        message: 'Seluruh data 30 produk, 800 transaksi 12 bulan, prediksi Regresi Linear, dan aturan Apriori akan dihapus lalu dibuat ulang. Tindakan ini tidak dapat dibatalkan.',
+                        confirmLabel: 'Ya, Reset Data'
+                    })"
                 >
                     @csrf
                     <button
@@ -51,25 +56,25 @@
 
     <!-- 6 KPI Cards -->
     <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-        <div class="rounded-3xl bg-white p-5 shadow-2xs ring-1 ring-black/[0.04]">
+        <div class="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/[0.04]">
             <p class="text-[11px] font-semibold uppercase tracking-wider text-[#86868b]">Total Pendapatan</p>
             <p class="mt-2 text-lg font-extrabold tracking-tight text-[#1d1d1f]">{{ rupiah($totalRevenue) }}</p>
             <p class="mt-1 text-[11px] text-emerald-700">Diskon bundle: {{ rupiah($totalDiscount) }}</p>
         </div>
 
-        <div class="rounded-3xl bg-white p-5 shadow-2xs ring-1 ring-black/[0.04]">
+        <div class="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/[0.04]">
             <p class="text-[11px] font-semibold uppercase tracking-wider text-[#86868b]">Estimasi Laba Kotor</p>
             <p class="mt-2 text-lg font-extrabold tracking-tight text-emerald-700">{{ rupiah($grossProfit) }}</p>
             <p class="mt-1 text-[11px] text-[#86868b]">Pendapatan &minus; HPP</p>
         </div>
 
-        <div class="rounded-3xl bg-white p-5 shadow-2xs ring-1 ring-black/[0.04]">
+        <div class="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/[0.04]">
             <p class="text-[11px] font-semibold uppercase tracking-wider text-[#86868b]">Total Transaksi</p>
             <p class="mt-2 text-lg font-extrabold tracking-tight text-[#1d1d1f]">{{ number_format($totalTransactions, 0, ',', '.') }}</p>
             <p class="mt-1 text-[11px] text-[#86868b]">POS {{ $posCount }} &bull; Online {{ $ecommerceCount }}</p>
         </div>
 
-        <div class="rounded-3xl bg-white p-5 shadow-2xs ring-1 ring-black/[0.04]">
+        <div class="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/[0.04]">
             <p class="text-[11px] font-semibold uppercase tracking-wider text-[#86868b]">Status Inventori</p>
             <p class="mt-2 text-lg font-extrabold tracking-tight {{ $criticalCount > 0 ? 'text-rose-600' : 'text-[#1d1d1f]' }}">
                 {{ $criticalCount }} Stok Kritis
@@ -77,13 +82,13 @@
             <p class="mt-1 text-[11px] text-[#86868b]">Dari {{ $totalProducts }} produk aktif</p>
         </div>
 
-        <div class="rounded-3xl bg-white p-5 shadow-2xs ring-1 ring-black/[0.04]">
+        <div class="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/[0.04]">
             <p class="text-[11px] font-semibold uppercase tracking-wider text-[#86868b]">R&sup2; Fast-Moving (OLS)</p>
             <p class="mt-2 text-lg font-extrabold tracking-tight text-[#0071e3]">{{ number_format($avgFastR2, 3) }}</p>
             <p class="mt-1 text-[11px] text-[#86868b]">Target &ge; 0.700 (Akurat)</p>
         </div>
 
-        <div class="rounded-3xl bg-white p-5 shadow-2xs ring-1 ring-black/[0.04]">
+        <div class="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/[0.04]">
             <p class="text-[11px] font-semibold uppercase tracking-wider text-[#86868b]">Aturan Apriori</p>
             <p class="mt-2 text-lg font-extrabold tracking-tight text-[#1d1d1f]">{{ $rulesCount }} Aturan</p>
             <p class="mt-1 text-[11px] text-[#86868b]">Lift Ratio &gt; 1.0</p>
@@ -92,7 +97,7 @@
 
     <!-- Charts Row -->
     <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div class="rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04] lg:col-span-2">
+        <div class="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04] lg:col-span-2">
             <div class="flex items-center justify-between">
                 <div>
                     <h3 class="text-base font-bold text-[#1d1d1f]">Tren Pendapatan &amp; Volume Transaksi (12 Bulan)</h3>
@@ -104,7 +109,7 @@
             </div>
         </div>
 
-        <div class="rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04]">
+        <div class="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04]">
             <h3 class="text-base font-bold text-[#1d1d1f]">Kontribusi Kategori Produk</h3>
             <p class="text-xs text-[#86868b]">Distribusi nilai penjualan per kategori</p>
             <div class="mt-4 h-60">
@@ -124,7 +129,7 @@
     <!-- Regresi Linear Restock & Apriori Rules -->
     <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
         <!-- Rekomendasi Restock Regresi Linear -->
-        <div class="rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04]">
+        <div class="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04]">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-[11px] font-bold uppercase tracking-wider text-[#0071e3]">Regresi Linear OLS (Split 80:20)</p>
@@ -167,7 +172,7 @@
         </div>
 
         <!-- Top Aturan Bundling Apriori -->
-        <div class="rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04]">
+        <div class="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04]">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-[11px] font-bold uppercase tracking-wider text-[#0071e3]">Market Basket Analysis</p>
@@ -204,7 +209,7 @@
 
     <!-- Top Produk & Transaksi Terbaru -->
     <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div class="rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04]">
+        <div class="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04]">
             <h3 class="text-base font-bold text-[#1d1d1f]">8 Produk Terlaris (12 Bulan)</h3>
             <div class="mt-4 overflow-x-auto">
                 <table class="w-full text-left text-xs">
@@ -230,7 +235,7 @@
             </div>
         </div>
 
-        <div class="rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04]">
+        <div class="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04]">
             <div class="flex items-center justify-between">
                 <h3 class="text-base font-bold text-[#1d1d1f]">Transaksi Penjualan Terbaru</h3>
                 <a href="{{ route('backoffice.reports.index') }}" class="text-xs font-semibold text-[#0071e3] hover:underline">Laporan Lengkap &rarr;</a>

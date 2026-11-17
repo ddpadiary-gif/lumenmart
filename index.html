@@ -37,7 +37,7 @@
     <!-- ====================================================================== -->
     <!-- PRINTABLE INVOICE MODAL (UNTUK CETAK / SIMPAN PDF)                      -->
     <!-- ====================================================================== -->
-    <div x-show="invoiceModalOrder" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
+    <div x-show="invoiceModalOrder" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
         <div @click.outside="invoiceModalOrder = null" class="w-full max-w-xl rounded-3xl bg-white p-8 shadow-2xl ring-1 ring-black/10">
             <template x-if="invoiceModalOrder">
                 <div>
@@ -138,20 +138,20 @@
                 <div class="mb-6 rounded-2xl bg-[#f5f5f7] p-3">
                     <p class="mb-2 text-[11px] font-semibold uppercase tracking-wider text-[#86868b]">Klik Akun Demo:</p>
                     <div class="grid grid-cols-3 gap-2 text-xs">
-                        <button type="button" @click="loginEmail = 'admin@lumenmart.test'; loginPassword = 'password'" class="rounded-xl bg-white px-2.5 py-2 font-semibold text-[#1d1d1f] shadow-2xs ring-1 ring-black/[0.06] transition hover:bg-[#1d1d1f] hover:text-white">Admin</button>
-                        <button type="button" @click="loginEmail = 'pemilik@lumenmart.test'; loginPassword = 'password'" class="rounded-xl bg-white px-2.5 py-2 font-semibold text-[#1d1d1f] shadow-2xs ring-1 ring-black/[0.06] transition hover:bg-[#1d1d1f] hover:text-white">Pemilik</button>
-                        <button type="button" @click="loginEmail = 'pelanggan@lumenmart.test'; loginPassword = 'password'" class="rounded-xl bg-white px-2.5 py-2 font-semibold text-[#1d1d1f] shadow-2xs ring-1 ring-black/[0.06] transition hover:bg-[#0071e3] hover:text-white">Pelanggan</button>
+                        <button type="button" @click="loginEmail = 'admin@lumenmart.test'; loginPassword = 'password'" class="rounded-xl bg-white px-2.5 py-2 font-semibold text-[#1d1d1f] shadow-sm ring-1 ring-black/[0.06] transition hover:bg-[#1d1d1f] hover:text-white">Admin</button>
+                        <button type="button" @click="loginEmail = 'pemilik@lumenmart.test'; loginPassword = 'password'" class="rounded-xl bg-white px-2.5 py-2 font-semibold text-[#1d1d1f] shadow-sm ring-1 ring-black/[0.06] transition hover:bg-[#1d1d1f] hover:text-white">Pemilik</button>
+                        <button type="button" @click="loginEmail = 'pelanggan@lumenmart.test'; loginPassword = 'password'" class="rounded-xl bg-white px-2.5 py-2 font-semibold text-[#1d1d1f] shadow-sm ring-1 ring-black/[0.06] transition hover:bg-[#0071e3] hover:text-white">Pelanggan</button>
                     </div>
                 </div>
 
                 <form @submit.prevent="performLogin()" class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Email</label>
-                        <input type="email" x-model="loginEmail" required class="mt-1 block w-full rounded-xl border-gray-300 shadow-2xs focus:border-[#0071e3] focus:ring-[#0071e3]" />
+                        <input type="email" x-model="loginEmail" required class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-[#0071e3] focus:ring-[#0071e3]" />
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Password</label>
-                        <input type="password" x-model="loginPassword" required class="mt-1 block w-full rounded-xl border-gray-300 shadow-2xs focus:border-[#0071e3] focus:ring-[#0071e3]" />
+                        <input type="password" x-model="loginPassword" required class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-[#0071e3] focus:ring-[#0071e3]" />
                     </div>
                     <div class="flex items-center justify-between">
                         <label class="inline-flex items-center">
@@ -178,15 +178,15 @@
                 <form @submit.prevent="performRegister()" class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Nama Lengkap</label>
-                        <input type="text" x-model="regName" required placeholder="Nama Anda" class="mt-1 block w-full rounded-xl border-gray-300 shadow-2xs" />
+                        <input type="text" x-model="regName" required placeholder="Nama Anda" class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm" />
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Email</label>
-                        <input type="email" x-model="regEmail" required placeholder="nama@email.com" class="mt-1 block w-full rounded-xl border-gray-300 shadow-2xs" />
+                        <input type="email" x-model="regEmail" required placeholder="nama@email.com" class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm" />
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Password</label>
-                        <input type="password" value="password123" required class="mt-1 block w-full rounded-xl border-gray-300 shadow-2xs" />
+                        <input type="password" value="password123" required class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm" />
                     </div>
                     <button type="submit" class="w-full rounded-full bg-[#1d1d1f] py-3 text-xs font-semibold text-white transition hover:bg-[#0071e3]">
                         Daftar Sebagai Pelanggan
@@ -351,7 +351,7 @@
                 </section>
 
                 <!-- Smart Bundle Apriori Section -->
-                <section id="bundling" class="mx-auto max-w-7xl px-4 pt-16 sm:px-6 lg:px-8">
+                <section id="bundling" class="mx-auto max-w-7xl scroll-mt-20 px-4 pt-16 sm:px-6 lg:px-8">
                     <div>
                         <p class="text-xs font-bold uppercase tracking-widest text-[#0071e3]">Market Basket Analysis &bull; Apriori</p>
                         <h2 class="mt-1 text-2xl font-extrabold tracking-tight text-[#1d1d1f] sm:text-3xl">
@@ -395,7 +395,7 @@
                 </section>
 
                 <!-- Katalog Produk Section -->
-                <section id="katalog" class="mx-auto max-w-7xl px-4 pt-16 sm:px-6 lg:px-8">
+                <section id="katalog" class="mx-auto max-w-7xl scroll-mt-20 px-4 pt-16 sm:px-6 lg:px-8">
                     <div class="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
                         <div>
                             <p class="text-xs font-bold uppercase tracking-widest text-[#86868b]">Katalog Lengkap</p>
@@ -409,7 +409,7 @@
                                 <svg class="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#86868b]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                                 </svg>
-                                <input x-model="search" type="search" placeholder="Cari nama produk atau SKU..." class="w-full rounded-full border-0 bg-white py-2.5 pl-10 pr-4 text-xs text-[#1d1d1f] shadow-2xs ring-1 ring-black/[0.08] placeholder:text-[#86868b] focus:ring-2 focus:ring-[#0071e3]" />
+                                <input x-model="search" type="search" placeholder="Cari nama produk atau SKU..." class="w-full rounded-full border-0 bg-white py-2.5 pl-10 pr-4 text-xs text-[#1d1d1f] shadow-sm ring-1 ring-black/[0.08] placeholder:text-[#86868b] focus:ring-2 focus:ring-[#0071e3]" />
                             </div>
                             <button type="button" @click="onlyFast = !onlyFast" :class="onlyFast ? 'bg-[#1d1d1f] text-white' : 'bg-white text-[#1d1d1f] ring-1 ring-black/[0.08]'" class="rounded-full px-4 py-2.5 text-xs font-semibold transition">
                                 Terlaris (Fast-Moving)
@@ -419,11 +419,11 @@
 
                     <!-- Filter Kategori Pill -->
                     <div class="mt-6 flex flex-wrap items-center gap-2">
-                        <button type="button" @click="activeCat = 'all'" :class="activeCat === 'all' ? 'bg-[#1d1d1f] text-white' : 'bg-white text-[#1d1d1f] hover:bg-gray-100'" class="rounded-full px-4 py-2 text-xs font-semibold shadow-2xs ring-1 ring-black/[0.06] transition">
+                        <button type="button" @click="activeCat = 'all'" :class="activeCat === 'all' ? 'bg-[#1d1d1f] text-white' : 'bg-white text-[#1d1d1f] hover:bg-gray-100'" class="rounded-full px-4 py-2 text-xs font-semibold shadow-sm ring-1 ring-black/[0.06] transition">
                             Semua Kategori (<span x-text="data.products.length"></span>)
                         </button>
                         <template x-for="cat in data.categories" :key="cat.slug">
-                            <button type="button" @click="activeCat = cat.slug" :class="activeCat === cat.slug ? 'bg-[#1d1d1f] text-white' : 'bg-white text-[#1d1d1f] hover:bg-gray-100'" class="rounded-full px-4 py-2 text-xs font-semibold shadow-2xs ring-1 ring-black/[0.06] transition">
+                            <button type="button" @click="activeCat = cat.slug" :class="activeCat === cat.slug ? 'bg-[#1d1d1f] text-white' : 'bg-white text-[#1d1d1f] hover:bg-gray-100'" class="rounded-full px-4 py-2 text-xs font-semibold shadow-sm ring-1 ring-black/[0.06] transition">
                                 <span x-text="cat.name"></span> (<span x-text="cat.products_count"></span>)
                             </button>
                         </template>
@@ -434,9 +434,13 @@
                         <template x-for="p in filteredCatalog()" :key="p.id">
                             <article class="group relative flex flex-col justify-between rounded-3xl bg-white p-5 shadow-[0_4px_24px_rgba(0,0,0,0.04)] ring-1 ring-black/[0.04] transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_14px_36px_rgba(0,0,0,0.08)]">
                                 <div>
-                                    <div class="relative aspect-[4/3] w-full overflow-hidden rounded-2xl" :style="'background-color:' + paletteFor(p.category_slug).bg">
-                                        <!-- Identik dengan x-product-visual SVG Apple -->
-                                        <div class="relative flex h-full w-full flex-col items-center justify-between overflow-hidden p-4 select-none">
+                                    <div class="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-[#f5f5f7]">
+                                        <template x-if="imgUrl(p)">
+                                            <img :src="imgUrl(p)" :alt="p.name" loading="lazy" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                                        </template>
+                                        <template x-if="!imgUrl(p)">
+                                            <!-- Identik dengan x-product-visual SVG Apple -->
+                                            <div class="relative flex h-full w-full flex-col items-center justify-between overflow-hidden p-4 select-none" :style="'background-color:' + paletteFor(p.category_slug).bg">
                                             <div class="flex w-full items-center justify-between text-[10px] font-semibold uppercase tracking-wider text-[#86868b]">
                                                 <span class="truncate" x-text="p.category"></span>
                                                 <span class="font-mono text-[9px] opacity-75" x-text="p.unit"></span>
@@ -451,6 +455,8 @@
 
                                             <p class="w-full truncate text-center text-[11px] font-medium tracking-tight text-[#1d1d1f]/80" x-text="p.name"></p>
                                         </div>
+
+                                        </template>
 
                                         <!-- Badge Movement & Stok -->
                                         <div class="absolute left-3 top-3 flex flex-wrap items-center gap-1.5">
@@ -511,14 +517,14 @@
                     <button @click="page = 'catalog'" class="rounded-full bg-[#1d1d1f] px-5 py-2.5 text-xs font-semibold text-white transition hover:bg-[#0071e3]">+ Jelajahi Katalog</button>
                 </div>
 
-                <div x-show="wishlist.length === 0" class="mt-10 rounded-3xl bg-white p-12 text-center shadow-2xs ring-1 ring-black/[0.04]">
+                <div x-show="wishlist.length === 0" class="mt-10 rounded-3xl bg-white p-12 text-center shadow-sm ring-1 ring-black/[0.04]">
                     <p class="text-base font-bold text-[#1d1d1f]">Belum ada produk di daftar Favorit Anda.</p>
                     <p class="mt-1 text-xs text-[#86868b]">Klik ikon hati pada kartu produk di katalog untuk menyimpannya di sini.</p>
                 </div>
 
                 <div x-show="wishlist.length > 0" class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     <template x-for="p in data.products.filter(x => wishlist.includes(x.id))" :key="p.id">
-                        <div class="flex flex-col justify-between rounded-3xl bg-white p-5 shadow-2xs ring-1 ring-black/[0.04]">
+                        <div class="flex flex-col justify-between rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/[0.04]">
                             <div>
                                 <p class="text-xs font-medium text-[#86868b]" x-text="p.category"></p>
                                 <h3 class="mt-1 text-base font-bold text-[#1d1d1f]" x-text="p.name"></h3>
@@ -549,7 +555,7 @@
                     <button @click="page = 'catalog'" class="text-xs font-semibold text-[#0071e3] hover:underline">&larr; Lanjut Belanja</button>
                 </div>
 
-                <div x-show="cart.length === 0" class="mt-10 rounded-3xl bg-white p-12 text-center shadow-2xs ring-1 ring-black/[0.04]">
+                <div x-show="cart.length === 0" class="mt-10 rounded-3xl bg-white p-12 text-center shadow-sm ring-1 ring-black/[0.04]">
                     <p class="text-base font-bold text-[#1d1d1f]">Keranjang belanja Anda masih kosong.</p>
                     <p class="mt-1 text-xs text-[#86868b]">Pilih produk kebutuhan harian atau ambil Paket Bundling Hemat dari katalog.</p>
                     <div class="mt-6 flex justify-center gap-3">
@@ -560,7 +566,7 @@
                 <div x-show="cart.length > 0" class="mt-8 grid gap-8 lg:grid-cols-3">
                     <div class="space-y-4 lg:col-span-2">
                         <template x-for="item in cart" :key="item.id">
-                            <div class="flex flex-col justify-between gap-4 rounded-3xl bg-white p-5 shadow-2xs ring-1 ring-black/[0.04] sm:flex-row sm:items-center">
+                            <div class="flex flex-col justify-between gap-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/[0.04] sm:flex-row sm:items-center">
                                 <div class="flex items-center gap-4">
                                     <div class="flex h-16 w-20 shrink-0 items-center justify-center rounded-2xl bg-[#f5f5f7] font-extrabold text-[#1d1d1f]" x-text="item.initials"></div>
                                     <div>
@@ -580,7 +586,7 @@
                         </template>
 
                         <!-- Rekomendasi Apriori: Sering Dibeli Bersama -->
-                        <div x-show="cartSuggestions().length > 0" class="mt-8 rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04]">
+                        <div x-show="cartSuggestions().length > 0" class="mt-8 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04]">
                             <p class="text-xs font-bold uppercase tracking-widest text-[#0071e3]">Rekomendasi Algoritma Apriori</p>
                             <h3 class="mt-1 text-base font-bold text-[#1d1d1f]">Lengkapi Paket Anda agar Dapat Diskon Smart Bundle</h3>
                             <div class="mt-4 grid gap-3 sm:grid-cols-2">
@@ -648,13 +654,13 @@
 
                 <form @submit.prevent="submitCheckout()" class="mt-8 grid gap-8 lg:grid-cols-3">
                     <div class="space-y-6 lg:col-span-2">
-                        <div class="rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04]">
+                        <div class="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04]">
                             <h2 class="text-base font-bold text-[#1d1d1f]">1. Alamat Pengiriman Lengkap</h2>
                             <p class="mt-1 text-xs text-[#86868b]">Cantumkan nama jalan, nomor rumah, kelurahan, kecamatan, dan nomor telepon penerima.</p>
                             <textarea x-model="shippingAddress" rows="3" required class="mt-4 w-full rounded-2xl border-gray-300 text-sm focus:border-[#0071e3] focus:ring-[#0071e3]"></textarea>
                         </div>
 
-                        <div class="rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04]">
+                        <div class="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04]">
                             <h2 class="text-base font-bold text-[#1d1d1f]">2. Pilih Metode Pembayaran</h2>
                             <div class="mt-4 grid gap-3 sm:grid-cols-3">
                                 <div @click="paymentMethod = 'qris'" :class="paymentMethod === 'qris' ? 'ring-2 ring-[#0071e3] bg-[#0071e3]/5' : 'ring-1 ring-black/[0.08] bg-white'" class="cursor-pointer rounded-2xl p-4 transition">
@@ -736,7 +742,7 @@
 
                 <div class="mt-8 space-y-4">
                     <template x-for="o in myOrders" :key="o.invoice_number">
-                        <div class="flex flex-col justify-between gap-4 rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04] sm:flex-row sm:items-center">
+                        <div class="flex flex-col justify-between gap-4 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04] sm:flex-row sm:items-center">
                             <div>
                                 <div class="flex flex-wrap items-center gap-2">
                                     <span class="font-mono text-sm font-bold text-[#1d1d1f]" x-text="o.invoice_number"></span>
@@ -783,7 +789,7 @@
                         </div>
 
                         <!-- Stepper Visual Status Pesanan -->
-                        <div class="mt-8 rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04]">
+                        <div class="mt-8 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04]">
                             <h2 class="text-xs font-bold uppercase tracking-widest text-[#86868b]">Pelacakan Status Pesanan</h2>
                             <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-4">
                                 <template x-for="(step, idx) in orderSteps" :key="step.key">
@@ -809,7 +815,7 @@
                         </div>
 
                         <div class="mt-6 grid gap-6 lg:grid-cols-3">
-                            <div class="rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04] lg:col-span-2">
+                            <div class="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04] lg:col-span-2">
                                 <h2 class="text-base font-bold text-[#1d1d1f]">Rincian Produk</h2>
                                 <div class="mt-4 divide-y divide-black/[0.05]">
                                     <template x-for="(d, idx) in (currentOrder.items || [])" :key="idx">
@@ -838,7 +844,7 @@
                                 </div>
                             </div>
 
-                            <div class="rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04]">
+                            <div class="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04]">
                                 <h2 class="text-base font-bold text-[#1d1d1f]">Informasi Pengiriman</h2>
                                 <div class="mt-4 space-y-3 text-xs">
                                     <div>
@@ -861,47 +867,137 @@
             </div>
         </main>
 
-        <!-- Quick View Modal (Identik storefront/index.blade.php) -->
-        <div x-show="quickProduct !== null" x-cloak @keydown.escape.window="quickProduct = null" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
-            <div @click.outside="quickProduct = null" class="w-full max-w-lg overflow-hidden rounded-3xl bg-white p-6 shadow-2xl ring-1 ring-black/[0.08]">
+        <!-- Quick View Modal (Apple-Style Split Product Modal) -->
+        <div
+            x-show="quickProduct !== null"
+            x-cloak
+            @keydown.escape.window="quickProduct = null"
+            class="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-4"
+            role="dialog"
+            aria-modal="true"
+        >
+            <div
+                x-show="quickProduct !== null"
+                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100"
+                x-transition:leave="transition ease-in duration-150"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
+                @click="quickProduct = null"
+                class="absolute inset-0 bg-black/45 backdrop-blur-sm"
+            ></div>
+
+            <div
+                x-show="quickProduct !== null"
+                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0 scale-95"
+                x-transition:enter-end="opacity-100 scale-100"
+                x-transition:leave="transition ease-in duration-150"
+                x-transition:leave-start="opacity-100 scale-100"
+                x-transition:leave-end="opacity-0 scale-95"
+                @click.outside="quickProduct = null"
+                class="relative max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-t-3xl bg-white shadow-[0_30px_80px_rgba(0,0,0,0.25)] ring-1 ring-black/[0.08] sm:rounded-3xl"
+            >
                 <template x-if="quickProduct">
-                    <div>
-                        <div class="flex items-start justify-between gap-4">
-                            <div>
-                                <span class="rounded-full bg-[#f5f5f7] px-3 py-1 text-[11px] font-semibold text-[#86868b]" x-text="quickProduct.category"></span>
-                                <h3 class="mt-2 text-xl font-extrabold tracking-tight text-[#1d1d1f]" x-text="quickProduct.name"></h3>
-                                <p class="text-xs text-[#86868b]">SKU: <span class="font-mono" x-text="quickProduct.sku"></span></p>
-                            </div>
-                            <button type="button" @click="quickProduct = null" class="rounded-full bg-[#f5f5f7] p-2 text-[#1d1d1f] hover:bg-gray-200">&#10005;</button>
-                        </div>
+                    <div class="grid gap-0 sm:grid-cols-2">
+                        <!-- Kolom Kiri: Foto Produk -->
+                        <div class="p-5 sm:p-6 sm:pr-3">
+                            <div class="relative aspect-square w-full overflow-hidden rounded-2xl bg-[#f5f5f7]">
+                                <template x-if="imgUrl(quickProduct)">
+                                    <img :src="imgUrl(quickProduct)" :alt="quickProduct.name" class="aspect-square h-full w-full rounded-2xl bg-[#f5f5f7] object-cover">
+                                </template>
+                                <template x-if="!imgUrl(quickProduct)">
+                                    <div class="flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-[#f5f5f7] to-[#e8e8ed]">
+                                        <span class="text-5xl font-extrabold tracking-tight text-[#1d1d1f]/80" x-text="quickProduct.initials"></span>
+                                        <span class="mt-2 text-xs font-medium text-[#86868b]" x-text="quickProduct.category"></span>
+                                    </div>
+                                </template>
 
-                        <p class="mt-4 text-sm leading-relaxed text-[#86868b]" x-text="quickProduct.description"></p>
-
-                        <div class="mt-5 grid grid-cols-3 gap-3 rounded-2xl bg-[#f5f5f7] p-4 text-xs">
-                            <div>
-                                <p class="text-[#86868b]">Harga Satuan</p>
-                                <p class="mt-0.5 text-sm font-bold text-[#1d1d1f]" x-text="rp(quickProduct.selling_price)"></p>
-                            </div>
-                            <div>
-                                <p class="text-[#86868b]">Ketersediaan</p>
-                                <p class="mt-0.5 font-semibold text-[#1d1d1f]"><span x-text="quickProduct.current_stock"></span> <span x-text="quickProduct.unit"></span></p>
-                            </div>
-                            <div>
-                                <p class="text-[#86868b]">Klasifikasi</p>
-                                <p class="mt-0.5 font-semibold text-[#0071e3]" x-text="quickProduct.movement_type === 'fast_moving' ? 'Fast-Moving' : 'Slow-Moving'"></p>
+                                <div class="absolute left-3 top-3 flex flex-wrap gap-1.5">
+                                    <span x-show="quickProduct.movement_type === 'fast_moving'" class="rounded-full bg-[#1d1d1f]/85 px-2.5 py-1 text-[10px] font-semibold tracking-wide text-white backdrop-blur-md">Terlaris (Fast-Moving)</span>
+                                    <span x-show="quickProduct.current_stock <= 0" class="rounded-full bg-rose-600 px-2.5 py-1 text-[10px] font-semibold text-white">Stok Habis</span>
+                                    <span x-show="quickProduct.current_stock > 0 && quickProduct.current_stock <= quickProduct.min_stock_threshold" class="rounded-full bg-amber-500/90 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur-md">Stok Kritis</span>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="mt-6 flex items-center gap-3">
-                            <input type="number" x-model.number="quickQty" min="1" :max="quickProduct.current_stock" class="w-24 rounded-full border-gray-300 text-center text-sm font-semibold focus:border-[#0071e3] focus:ring-[#0071e3]">
-                            <button type="button" @click="addToCart(quickProduct, quickQty); quickProduct = null" :disabled="quickProduct.current_stock < 1" class="flex-1 rounded-full bg-[#1d1d1f] py-3 text-xs font-semibold text-white transition hover:bg-[#0071e3] disabled:bg-gray-300">
-                                + Tambah ke Keranjang
-                            </button>
+                        <!-- Kolom Kanan: Detail Produk -->
+                        <div class="flex flex-col p-5 pt-0 sm:p-6 sm:pl-3">
+                            <div class="flex items-start justify-between gap-3">
+                                <span class="rounded-full bg-[#0071e3]/10 px-3 py-1 text-[11px] font-semibold text-[#0071e3]" x-text="quickProduct.category"></span>
+                                <button
+                                    type="button"
+                                    @click="quickProduct = null"
+                                    class="-mr-1 -mt-1 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#f5f5f7] text-sm text-[#1d1d1f] transition hover:bg-gray-200"
+                                    aria-label="Tutup"
+                                >&#10005;</button>
+                            </div>
+
+                            <h3 class="mt-3 text-xl font-extrabold leading-tight tracking-tight text-[#1d1d1f] sm:text-2xl" x-text="quickProduct.name"></h3>
+                            <p class="mt-1 text-[11px] text-[#86868b]">SKU: <span class="font-mono" x-text="quickProduct.sku"></span></p>
+
+                            <p class="mt-3 text-sm leading-relaxed text-[#86868b]" x-text="quickProduct.description"></p>
+
+                            <div class="mt-4">
+                                <p class="text-3xl font-extrabold tracking-tight text-[#1d1d1f]" x-text="rp(quickProduct.selling_price)"></p>
+                                <p class="text-[11px] text-[#86868b]">per <span x-text="quickProduct.unit"></span> &bull; <span x-text="quickProduct.movement_type === 'fast_moving' ? 'Fast-Moving' : 'Slow-Moving'"></span></p>
+                            </div>
+
+                            <!-- Progress Ketersediaan Stok -->
+                            <div class="mt-4 rounded-2xl bg-[#f5f5f7] p-3.5">
+                                <div class="flex items-center justify-between text-[11px]">
+                                    <span class="font-medium text-[#86868b]">Ketersediaan Stok</span>
+                                    <span class="font-semibold" :class="quickProduct.current_stock <= 0 ? 'text-rose-600' : (quickProduct.current_stock <= quickProduct.min_stock_threshold ? 'text-amber-600' : 'text-emerald-600')">
+                                        <span x-text="quickProduct.current_stock"></span> <span x-text="quickProduct.unit"></span>
+                                    </span>
+                                </div>
+                                <div class="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-black/[0.08]">
+                                    <div
+                                        class="h-full rounded-full transition-all duration-500"
+                                        :class="quickProduct.current_stock <= 0 ? 'bg-rose-500' : (quickProduct.current_stock <= quickProduct.min_stock_threshold ? 'bg-amber-500' : 'bg-emerald-500')"
+                                        :style="`width: ${quickProduct.current_stock <= 0 ? 0 : stockPercent(quickProduct)}%`"
+                                    ></div>
+                                </div>
+                            </div>
+
+                            <div class="mt-5 space-y-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="inline-flex items-center rounded-full bg-[#f5f5f7] p-1 ring-1 ring-black/[0.06]">
+                                        <button type="button" @click="stepQuickQty(-1)" :disabled="quickQty <= 1" class="inline-flex h-8 w-8 items-center justify-center rounded-full text-base font-semibold text-[#1d1d1f] transition hover:bg-white disabled:opacity-30" aria-label="Kurangi">&minus;</button>
+                                        <span class="w-9 text-center text-sm font-bold tabular-nums text-[#1d1d1f]" x-text="quickQty"></span>
+                                        <button type="button" @click="stepQuickQty(1)" :disabled="quickQty >= Math.min(99, quickProduct.current_stock)" class="inline-flex h-8 w-8 items-center justify-center rounded-full text-base font-semibold text-[#1d1d1f] transition hover:bg-white disabled:opacity-30" aria-label="Tambah">+</button>
+                                    </div>
+                                    <p class="text-[11px] text-[#86868b]">Subtotal <span class="font-semibold text-[#1d1d1f]" x-text="rp(quickProduct.selling_price * quickQty)"></span></p>
+                                </div>
+
+                                <div class="flex items-center gap-2">
+                                    <button
+                                        type="button"
+                                        @click="addToCart(quickProduct, quickQty); quickProduct = null"
+                                        :disabled="quickProduct.current_stock < 1"
+                                        class="flex-1 rounded-full bg-[#1d1d1f] py-3 text-xs font-semibold text-white transition hover:bg-[#0071e3] disabled:cursor-not-allowed disabled:bg-gray-300"
+                                    >
+                                        + Tambah ke Keranjang
+                                    </button>
+                                    <button
+                                        type="button"
+                                        @click="toggleWishlist(quickProduct)"
+                                        :title="wishlist.includes(quickProduct.id) ? 'Hapus dari Favorit' : 'Simpan ke Favorit'"
+                                        class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#f5f5f7] ring-1 ring-black/[0.06] transition hover:scale-105 active:scale-95"
+                                    >
+                                        <svg class="h-5 w-5 transition-colors" :class="wishlist.includes(quickProduct.id) ? 'fill-rose-500 text-rose-500' : 'fill-none text-[#1d1d1f]'" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </template>
             </div>
         </div>
+
 
         <!-- Apple-Inspired Minimalist Footer (identik layouts/app.blade.php) -->
         <footer class="mt-20 border-t border-black/[0.06] bg-white">
@@ -954,10 +1050,10 @@
     <!-- ====================================================================== -->
     <div x-show="area === 'backoffice'" x-cloak class="flex min-h-screen">
         <!-- Mobile Backdrop -->
-        <div x-show="sidebarOpen" @click="sidebarOpen = false" class="fixed inset-0 z-40 bg-black/50 backdrop-blur-xs lg:hidden"></div>
+        <div x-show="sidebarOpen" @click="sidebarOpen = false" class="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden"></div>
 
         <!-- Dark Apple-Inspired Sidebar (#1d1d1f) -->
-        <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'" class="fixed inset-y-0 left-0 z-50 flex w-68 shrink-0 flex-col bg-[#1d1d1f] text-white transition-transform duration-200 lg:static">
+        <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'" class="fixed inset-y-0 left-0 z-50 flex w-64 shrink-0 flex-col bg-[#1d1d1f] text-white transition-transform duration-200 lg:static">
             <div class="flex h-16 items-center justify-between border-b border-white/10 px-6">
                 <button @click="openTab('dashboard')" class="flex items-center gap-3 text-left">
                     <span class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-[#0071e3] text-white">
@@ -1110,7 +1206,7 @@
                 <!-- TAB 1: DASHBOARD EKSEKUTIF (identik backoffice/dashboard)  -->
                 <!-- ========================================================== -->
                 <div x-show="tab === 'dashboard'">
-                    <div class="flex flex-col justify-between gap-4 rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04] lg:flex-row lg:items-center">
+                    <div class="flex flex-col justify-between gap-4 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04] lg:flex-row lg:items-center">
                         <div>
                             <span class="inline-flex items-center gap-2 rounded-full bg-[#f5f5f7] px-3 py-1 text-[11px] font-semibold text-[#1d1d1f]">
                                 <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
@@ -1135,32 +1231,32 @@
 
                     <!-- 6 KPI Cards -->
                     <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-                        <div class="rounded-3xl bg-white p-5 shadow-2xs ring-1 ring-black/[0.04]">
+                        <div class="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/[0.04]">
                             <p class="text-[11px] font-semibold uppercase tracking-wider text-[#86868b]">Total Pendapatan</p>
                             <p class="mt-2 text-lg font-extrabold tracking-tight text-[#1d1d1f]" x-text="rp(data.kpi.total_revenue)"></p>
                             <p class="mt-1 text-[11px] text-emerald-700" x-text="'Diskon bundle: ' + rp(data.kpi.total_discount)"></p>
                         </div>
-                        <div class="rounded-3xl bg-white p-5 shadow-2xs ring-1 ring-black/[0.04]">
+                        <div class="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/[0.04]">
                             <p class="text-[11px] font-semibold uppercase tracking-wider text-[#86868b]">Estimasi Laba Kotor</p>
                             <p class="mt-2 text-lg font-extrabold tracking-tight text-emerald-700" x-text="rp(data.kpi.gross_profit)"></p>
                             <p class="mt-1 text-[11px] text-[#86868b]">Pendapatan &minus; HPP</p>
                         </div>
-                        <div class="rounded-3xl bg-white p-5 shadow-2xs ring-1 ring-black/[0.04]">
+                        <div class="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/[0.04]">
                             <p class="text-[11px] font-semibold uppercase tracking-wider text-[#86868b]">Total Transaksi</p>
                             <p class="mt-2 text-lg font-extrabold tracking-tight text-[#1d1d1f]" x-text="data.kpi.total_transactions"></p>
                             <p class="mt-1 text-[11px] text-[#86868b]" x-text="'POS ' + data.kpi.pos_count + ' • Online ' + data.kpi.ecommerce_count"></p>
                         </div>
-                        <div class="rounded-3xl bg-white p-5 shadow-2xs ring-1 ring-black/[0.04]">
+                        <div class="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/[0.04]">
                             <p class="text-[11px] font-semibold uppercase tracking-wider text-[#86868b]">Status Inventori</p>
                             <p class="mt-2 text-lg font-extrabold tracking-tight text-rose-600" x-text="criticalProducts().length + ' Stok Kritis'"></p>
                             <p class="mt-1 text-[11px] text-[#86868b]" x-text="'Dari ' + data.products.length + ' produk aktif'"></p>
                         </div>
-                        <div class="rounded-3xl bg-white p-5 shadow-2xs ring-1 ring-black/[0.04]">
+                        <div class="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/[0.04]">
                             <p class="text-[11px] font-semibold uppercase tracking-wider text-[#86868b]">R&sup2; Fast-Moving (OLS)</p>
                             <p class="mt-2 text-lg font-extrabold tracking-tight text-[#0071e3]" x-text="data.kpi.avg_fast_r2.toFixed(3)"></p>
                             <p class="mt-1 text-[11px] text-[#86868b]">Target &ge; 0.700 (Akurat)</p>
                         </div>
-                        <div class="rounded-3xl bg-white p-5 shadow-2xs ring-1 ring-black/[0.04]">
+                        <div class="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/[0.04]">
                             <p class="text-[11px] font-semibold uppercase tracking-wider text-[#86868b]">Aturan Apriori</p>
                             <p class="mt-2 text-lg font-extrabold tracking-tight text-[#1d1d1f]" x-text="data.rules.length + ' Aturan'"></p>
                             <p class="mt-1 text-[11px] text-[#86868b]">Lift Ratio &gt; 1.0</p>
@@ -1169,13 +1265,13 @@
 
                     <!-- Charts Row -->
                     <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
-                        <div class="rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04] lg:col-span-2">
+                        <div class="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04] lg:col-span-2">
                             <h3 class="text-base font-bold text-[#1d1d1f]">Tren Pendapatan &amp; Volume Transaksi (12 Bulan)</h3>
                             <p class="text-xs text-[#86868b]">Perbandingan kontribusi POS Toko vs E-Commerce per bulan</p>
                             <div class="mt-4 h-72"><canvas id="revenueChart"></canvas></div>
                         </div>
 
-                        <div class="rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04]">
+                        <div class="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04]">
                             <h3 class="text-base font-bold text-[#1d1d1f]">Kontribusi Kategori Produk</h3>
                             <p class="text-xs text-[#86868b]">Distribusi nilai penjualan per kategori</p>
                             <div class="mt-4 h-60"><canvas id="categoryChart"></canvas></div>
@@ -1192,7 +1288,7 @@
 
                     <!-- Regresi Linear Restock & Apriori Rules -->
                     <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
-                        <div class="rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04]">
+                        <div class="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04]">
                             <div class="flex items-center justify-between">
                                 <div>
                                     <p class="text-[11px] font-bold uppercase tracking-wider text-[#0071e3]">Regresi Linear OLS (Split 80:20)</p>
@@ -1220,7 +1316,7 @@
                             </div>
                         </div>
 
-                        <div class="rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04]">
+                        <div class="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04]">
                             <div class="flex items-center justify-between">
                                 <div>
                                     <p class="text-[11px] font-bold uppercase tracking-wider text-[#0071e3]">Market Basket Analysis</p>
@@ -1248,7 +1344,7 @@
 
                     <!-- Top 8 Produk & Transaksi Terbaru -->
                     <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
-                        <div class="rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04]">
+                        <div class="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04]">
                             <h3 class="text-base font-bold text-[#1d1d1f]">8 Produk Terlaris (12 Bulan)</h3>
                             <div class="mt-4 overflow-x-auto">
                                 <table class="w-full text-left text-xs">
@@ -1274,7 +1370,7 @@
                             </div>
                         </div>
 
-                        <div class="rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04]">
+                        <div class="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04]">
                             <div class="flex items-center justify-between">
                                 <h3 class="text-base font-bold text-[#1d1d1f]">Transaksi Penjualan Terbaru</h3>
                                 <button @click="openTab('reports')" class="text-xs font-semibold text-[#0071e3] hover:underline">Laporan Lengkap &rarr;</button>
@@ -1314,7 +1410,7 @@
                 <!-- TAB 2: REGRESI LINEAR (identik analytics/regression)       -->
                 <!-- ========================================================== -->
                 <div x-show="tab === 'regression'" x-cloak>
-                    <div class="flex flex-col justify-between gap-4 rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04] lg:flex-row lg:items-center">
+                    <div class="flex flex-col justify-between gap-4 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04] lg:flex-row lg:items-center">
                         <div>
                             <p class="text-xs font-bold uppercase tracking-widest text-[#0071e3]">Ordinary Least Squares (Y = a + bX) &bull; Split Kronologis 80:20</p>
                             <h2 class="mt-1 text-2xl font-extrabold tracking-tight text-[#1d1d1f]" x-text="'Peramalan Permintaan Bulan ke-13 (' + data.target_month + ')'"></h2>
@@ -1326,29 +1422,29 @@
                     </div>
 
                     <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                        <div class="rounded-3xl bg-white p-5 shadow-2xs ring-1 ring-black/[0.04]">
+                        <div class="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/[0.04]">
                             <p class="text-[11px] font-semibold uppercase tracking-wider text-[#86868b]">Rata-rata R&sup2; (Fast-Moving)</p>
                             <p class="mt-2 text-2xl font-extrabold text-[#0071e3]" x-text="data.kpi.avg_fast_r2.toFixed(4)"></p>
                             <p class="mt-1 text-[11px] text-emerald-700">Memenuhi syarat R&sup2; &ge; 0.70</p>
                         </div>
-                        <div class="rounded-3xl bg-white p-5 shadow-2xs ring-1 ring-black/[0.04]">
+                        <div class="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/[0.04]">
                             <p class="text-[11px] font-semibold uppercase tracking-wider text-[#86868b]">Rata-rata MAE (Uji 20%)</p>
                             <p class="mt-2 text-2xl font-extrabold text-[#1d1d1f]" x-text="data.kpi.avg_fast_mae.toFixed(2)"></p>
                             <p class="mt-1 text-[11px] text-[#86868b]">Mean Absolute Error (Bulan 11&ndash;12)</p>
                         </div>
-                        <div class="rounded-3xl bg-white p-5 shadow-2xs ring-1 ring-black/[0.04]">
+                        <div class="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/[0.04]">
                             <p class="text-[11px] font-semibold uppercase tracking-wider text-[#86868b]">Rata-rata RMSE (Uji 20%)</p>
                             <p class="mt-2 text-2xl font-extrabold text-[#1d1d1f]" x-text="data.kpi.avg_fast_rmse.toFixed(2)"></p>
                             <p class="mt-1 text-[11px] text-[#86868b]">Root Mean Squared Error</p>
                         </div>
-                        <div class="rounded-3xl bg-white p-5 shadow-2xs ring-1 ring-black/[0.04]">
+                        <div class="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/[0.04]">
                             <p class="text-[11px] font-semibold uppercase tracking-wider text-[#86868b]">Total Rekomendasi Restock</p>
                             <p class="mt-2 text-2xl font-extrabold text-amber-700" x-text="totalRestockUnits() + ' unit'"></p>
                             <p class="mt-1 text-[11px] text-[#86868b]">Seluruh produk yang perlu ditambah</p>
                         </div>
                     </div>
 
-                    <div class="mt-6 rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04]">
+                    <div class="mt-6 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04]">
                         <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
                             <div>
                                 <span class="rounded-full bg-[#f5f5f7] px-3 py-1 text-[11px] font-semibold text-[#1d1d1f]" x-text="selectedRegProduct().category + ' • ' + (selectedRegProduct().movement_type === 'fast_moving' ? 'Fast-Moving' : 'Slow-Moving')"></span>
@@ -1370,7 +1466,7 @@
                         <div class="mt-5 h-72"><canvas id="regressionChart"></canvas></div>
                     </div>
 
-                    <div class="mt-6 rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04]">
+                    <div class="mt-6 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04]">
                         <div class="flex items-center justify-between">
                             <h3 class="text-base font-bold text-[#1d1d1f]">Tabel Hasil Regresi Linear Seluruh Produk (30)</h3>
                             <button @click="exportInventoryCsv()" class="text-xs font-semibold text-[#0071e3] hover:underline">Unduh CSV Prediksi &rarr;</button>
@@ -1414,7 +1510,7 @@
                 <!-- TAB 3: APRIORI (identik analytics/apriori.blade.php)       -->
                 <!-- ========================================================== -->
                 <div x-show="tab === 'apriori'" x-cloak>
-                    <div class="flex flex-col justify-between gap-4 rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04] lg:flex-row lg:items-center">
+                    <div class="flex flex-col justify-between gap-4 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04] lg:flex-row lg:items-center">
                         <div>
                             <p class="text-xs font-bold uppercase tracking-widest text-[#0071e3]">Frequent Itemset Mining (L1, L2, L3) &bull; Lift Ratio &gt; 1.0</p>
                             <h2 class="mt-1 text-2xl font-extrabold tracking-tight text-[#1d1d1f]">Rekomendasi Paket Bundling &amp; Tata Letak Rak</h2>
@@ -1436,12 +1532,12 @@
                         </div>
                     </div>
 
-                    <div class="mt-6 rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04]">
+                    <div class="mt-6 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04]">
                         <h3 class="text-base font-bold text-[#1d1d1f]">Perbandingan Confidence (%) &amp; Lift Ratio Aturan Teratas</h3>
                         <div class="mt-4 h-72"><canvas id="aprioriChart"></canvas></div>
                     </div>
 
-                    <div class="mt-6 rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04]">
+                    <div class="mt-6 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04]">
                         <h3 class="text-base font-bold text-[#1d1d1f]" x-text="'Daftar Aturan Asosiasi (' + filteredAprioriRules().length + ' Aturan dengan Lift > 1.0)'"></h3>
                         <div class="mt-4 overflow-x-auto">
                             <table class="w-full text-left text-xs">
@@ -1477,7 +1573,7 @@
                 <!-- TAB 4: LAPORAN CSV / PDF (identik backoffice/reports)      -->
                 <!-- ========================================================== -->
                 <div x-show="tab === 'reports'" x-cloak>
-                    <div class="flex flex-col justify-between gap-4 rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04] lg:flex-row lg:items-end">
+                    <div class="flex flex-col justify-between gap-4 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04] lg:flex-row lg:items-end">
                         <div class="flex flex-wrap items-end gap-3">
                             <div>
                                 <label class="block text-[10px] font-bold uppercase text-[#86868b]">Channel</label>
@@ -1496,13 +1592,13 @@
                     </div>
 
                     <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-4">
-                        <div class="rounded-3xl bg-white p-5 shadow-2xs"><p class="text-[11px] font-semibold uppercase text-[#86868b]">Total Omzet (12 Bulan)</p><p class="mt-1 text-xl font-extrabold text-[#1d1d1f]" x-text="rp(data.kpi.total_revenue)"></p></div>
-                        <div class="rounded-3xl bg-white p-5 shadow-2xs"><p class="text-[11px] font-semibold uppercase text-[#86868b]">Total Diskon Smart Bundle</p><p class="mt-1 text-xl font-extrabold text-emerald-700" x-text="rp(data.kpi.total_discount)"></p></div>
-                        <div class="rounded-3xl bg-white p-5 shadow-2xs"><p class="text-[11px] font-semibold uppercase text-[#86868b]">Jumlah Transaksi</p><p class="mt-1 text-xl font-extrabold text-[#1d1d1f]" x-text="data.kpi.total_transactions"></p></div>
-                        <div class="rounded-3xl bg-white p-5 shadow-2xs"><p class="text-[11px] font-semibold uppercase text-[#86868b]">Nilai Aset Stok Gudang</p><p class="mt-1 text-xl font-extrabold text-[#0071e3]" x-text="rp(inventoryValue())"></p></div>
+                        <div class="rounded-3xl bg-white p-5 shadow-sm"><p class="text-[11px] font-semibold uppercase text-[#86868b]">Total Omzet (12 Bulan)</p><p class="mt-1 text-xl font-extrabold text-[#1d1d1f]" x-text="rp(data.kpi.total_revenue)"></p></div>
+                        <div class="rounded-3xl bg-white p-5 shadow-sm"><p class="text-[11px] font-semibold uppercase text-[#86868b]">Total Diskon Smart Bundle</p><p class="mt-1 text-xl font-extrabold text-emerald-700" x-text="rp(data.kpi.total_discount)"></p></div>
+                        <div class="rounded-3xl bg-white p-5 shadow-sm"><p class="text-[11px] font-semibold uppercase text-[#86868b]">Jumlah Transaksi</p><p class="mt-1 text-xl font-extrabold text-[#1d1d1f]" x-text="data.kpi.total_transactions"></p></div>
+                        <div class="rounded-3xl bg-white p-5 shadow-sm"><p class="text-[11px] font-semibold uppercase text-[#86868b]">Nilai Aset Stok Gudang</p><p class="mt-1 text-xl font-extrabold text-[#0071e3]" x-text="rp(inventoryValue())"></p></div>
                     </div>
 
-                    <div class="mt-6 rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04]">
+                    <div class="mt-6 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04]">
                         <h3 class="text-base font-bold text-[#1d1d1f]">Rincian Transaksi Penjualan Terbaru</h3>
                         <div class="mt-4 overflow-x-auto">
                             <table class="w-full text-left text-xs">
@@ -1536,7 +1632,7 @@
                 <!-- ========================================================== -->
                 <div x-show="tab === 'pos'" x-cloak class="grid gap-6 lg:grid-cols-3">
                     <div class="space-y-4 lg:col-span-2">
-                        <div class="rounded-3xl bg-white p-5 shadow-2xs ring-1 ring-black/[0.04]">
+                        <div class="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/[0.04]">
                             <div class="flex flex-col gap-3 sm:flex-row">
                                 <input x-model="posSearch" type="search" placeholder="Scan / ketik nama produk atau SKU..." class="flex-1 rounded-full border-gray-300 bg-[#f5f5f7] px-4 py-2.5 text-xs" />
                                 <select x-model="posCategory" class="rounded-full border-gray-300 bg-[#f5f5f7] py-2.5 pl-4 pr-8 text-xs font-semibold">
@@ -1562,7 +1658,7 @@
                             </div>
                         </div>
 
-                        <div class="rounded-3xl bg-white p-5 shadow-2xs ring-1 ring-black/[0.04]">
+                        <div class="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/[0.04]">
                             <h3 class="text-sm font-bold text-[#1d1d1f]">Transaksi POS Terbaru</h3>
                             <div class="mt-3 divide-y divide-black/[0.05] text-xs">
                                 <template x-for="pos in data.recent_sales.filter(s => s.channel === 'pos_toko').slice(0, 6)" :key="pos.invoice_number">
@@ -1654,7 +1750,7 @@
                 <!-- TAB 6: PESANAN E-COMMERCE (identik backoffice/orders)      -->
                 <!-- ========================================================== -->
                 <div x-show="tab === 'orders'" x-cloak>
-                    <div class="rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04]">
+                    <div class="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04]">
                         <h2 class="text-base font-bold text-[#1d1d1f]">Daftar Pesanan E-Commerce Pelanggan</h2>
                         <div class="mt-4 overflow-x-auto">
                             <table class="w-full text-left text-xs">
@@ -1702,7 +1798,7 @@
                 <!-- TAB 7: BARANG MASUK RESTOCK (identik backoffice/incoming)  -->
                 <!-- ========================================================== -->
                 <div x-show="tab === 'incoming'" x-cloak class="grid gap-6 lg:grid-cols-3">
-                    <div class="rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04]">
+                    <div class="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04]">
                         <h2 class="text-base font-bold text-[#1d1d1f]">Catat Barang Masuk (Restock)</h2>
                         <p class="mt-1 text-xs text-[#86868b]">Stok produk otomatis bertambah setelah transaksi disimpan.</p>
                         <form @submit.prevent="submitRestock()" class="mt-5 space-y-4">
@@ -1732,7 +1828,7 @@
                         </form>
                     </div>
 
-                    <div class="rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04] lg:col-span-2">
+                    <div class="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04] lg:col-span-2">
                         <h2 class="text-base font-bold text-[#1d1d1f]">Riwayat Barang Masuk Terbaru</h2>
                         <div class="mt-4 overflow-x-auto">
                             <table class="w-full text-left text-xs">
@@ -1765,7 +1861,7 @@
                 <!-- TAB 8: KATALOG PRODUK ADMIN (identik backoffice/products)  -->
                 <!-- ========================================================== -->
                 <div x-show="tab === 'products'" x-cloak>
-                    <div class="rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04]">
+                    <div class="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04]">
                         <div class="flex flex-wrap items-center justify-between gap-4">
                             <h2 class="text-base font-bold text-[#1d1d1f]" x-text="'Manajemen Katalog Produk (' + data.products.length + ' Produk)'"></h2>
                             <input x-model="adminProdSearch" type="search" placeholder="Cari produk / SKU..." class="rounded-full border-gray-300 bg-[#f5f5f7] px-4 py-2 text-xs" />
@@ -1809,7 +1905,7 @@
                 <!-- TAB 9: KATEGORI PRODUK (identik backoffice/categories)     -->
                 <!-- ========================================================== -->
                 <div x-show="tab === 'categories'" x-cloak class="grid gap-6 lg:grid-cols-3">
-                    <div class="rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04]">
+                    <div class="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04]">
                         <h2 class="text-base font-bold text-[#1d1d1f]">Tambah Kategori Baru</h2>
                         <form @submit.prevent="addCategory()" class="mt-4 space-y-4">
                             <div>
@@ -1823,7 +1919,7 @@
                             <button type="submit" class="w-full rounded-full bg-[#1d1d1f] py-2.5 text-xs font-semibold text-white hover:bg-[#0071e3]">+ Simpan Kategori</button>
                         </form>
                     </div>
-                    <div class="rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04] lg:col-span-2">
+                    <div class="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04] lg:col-span-2">
                         <h2 class="text-base font-bold text-[#1d1d1f]" x-text="'Daftar Kategori (' + data.categories.length + ')'"></h2>
                         <div class="mt-4 divide-y divide-black/[0.05]">
                             <template x-for="cat in data.categories" :key="cat.slug">
@@ -2013,6 +2109,20 @@
                         this.wishlist.push(product.id);
                         this.setFlash(product.name + ' ditambahkan ke Favorit.');
                     }
+                },
+                imgUrl(product) {
+                    if (!product || !product.image_path) return null;
+                    const path = product.image_path.replace(/^\/+/, '');
+                    return path.startsWith('public/') ? path : 'public/' + path;
+                },
+                stepQuickQty(delta) {
+                    if (!this.quickProduct) return;
+                    this.quickQty = Math.max(1, Math.min(Math.min(99, this.quickProduct.current_stock || 1), (this.quickQty || 1) + delta));
+                },
+                stockPercent(p) {
+                    if (!p) return 0;
+                    const ref = Math.max((p.min_stock_threshold || 5) * 4, p.current_stock, 1);
+                    return Math.max(4, Math.min(100, Math.round(p.current_stock / ref * 100)));
                 },
                 cartCount() {
                     return this.cart.reduce((s, c) => s + (Number(c.qty) || 0), 0);

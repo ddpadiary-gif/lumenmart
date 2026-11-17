@@ -55,7 +55,12 @@ class PosController extends Controller
             ->limit(6)
             ->get();
 
-        return view('backoffice.pos.index', compact('categories', 'products', 'rules', 'recentPos'));
+        // Transaksi yang baru saja disimpan (untuk modal konfirmasi struk).
+        $lastTransaction = session('last_invoice')
+            ? SalesTransaction::with('details.product')->where('invoice_number', session('last_invoice'))->first()
+            : null;
+
+        return view('backoffice.pos.index', compact('categories', 'products', 'rules', 'recentPos', 'lastTransaction'));
     }
 
     public function store(Request $request, SalesService $sales): RedirectResponse

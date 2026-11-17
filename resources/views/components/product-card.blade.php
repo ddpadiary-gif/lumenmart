@@ -46,14 +46,36 @@
             <!-- Tombol Wishlist (Customer) -->
             @auth
                 @if (auth()->user()->isCustomer())
-                    <form action="{{ route('wishlist.toggle', $product) }}" method="POST" class="absolute right-3 top-3">
+                    <form
+                        action="{{ route('wishlist.toggle', $product) }}"
+                        method="POST"
+                        class="absolute right-3 top-3"
+                        x-data="{
+                            wished: {{ $wishlisted ? 'true' : 'false' }},
+                            busy: false,
+                            async toggle(form) {
+                                if (this.busy) return;
+                                this.busy = true;
+                                const result = await lumen.toggleWishlist(form, {{ $product->id }}, @js($product->name));
+                                if (result !== null) this.wished = result;
+                                this.busy = false;
+                            }
+                        }"
+                        @wishlist-updated.window="if ($event.detail.id === {{ $product->id }}) wished = $event.detail.wishlisted"
+                        @submit.prevent="toggle($el)"
+                    >
                         @csrf
                         <button
                             type="submit"
                             title="Simpan ke Favorit"
-                            class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-[#1d1d1f] shadow-sm backdrop-blur-md transition hover:scale-110"
+                            :aria-pressed="wished.toString()"
+                            class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-[#1d1d1f] shadow-sm backdrop-blur-md transition hover:scale-110 active:scale-95"
                         >
-                            <svg class="h-4 w-4 {{ $wishlisted ? 'fill-rose-500 text-rose-500' : 'fill-none text-[#1d1d1f]' }}" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                            <svg
+                                class="h-4 w-4 transition-colors {{ $wishlisted ? 'fill-rose-500 text-rose-500' : 'fill-none text-[#1d1d1f]' }}"
+                                :class="wished ? 'fill-rose-500 text-rose-500' : 'fill-none text-[#1d1d1f]'"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"
+                            >
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
                             </svg>
                         </button>
@@ -91,7 +113,7 @@
 
             @auth
                 @if (auth()->user()->isCustomer())
-                    <form action="{{ route('cart.add') }}" method="POST">
+                    <form action="{{ route('cart.add') }}" method="POST" x-data @submit.prevent="lumen.addToCart($el)">
                         @csrf
                         <input type="hidden" name="product_id" value="{{ $product->id }}">
                         <input type="hidden" name="quantity" value="1">

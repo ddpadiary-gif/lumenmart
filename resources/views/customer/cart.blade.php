@@ -12,7 +12,7 @@
         </div>
 
         @if (empty($summary['lines']))
-            <div class="mt-10 rounded-3xl bg-white p-12 text-center shadow-2xs ring-1 ring-black/[0.04]">
+            <div class="mt-10 rounded-3xl bg-white p-12 text-center shadow-sm ring-1 ring-black/[0.04]">
                 <p class="text-base font-bold text-[#1d1d1f]">Keranjang belanja Anda masih kosong.</p>
                 <p class="mt-1 text-xs text-[#86868b]">Pilih produk kebutuhan harian atau ambil Paket Bundling Hemat dari katalog.</p>
                 <div class="mt-6 flex justify-center gap-3">
@@ -33,7 +33,7 @@
                             /** @var \App\Models\Product $p */
                             $p = $line['product'];
                         @endphp
-                        <div class="flex flex-col justify-between gap-4 rounded-3xl bg-white p-5 shadow-2xs ring-1 ring-black/[0.04] sm:flex-row sm:items-center">
+                        <div class="flex flex-col justify-between gap-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/[0.04] sm:flex-row sm:items-center">
                             <div class="flex items-center gap-4">
                                 <div class="h-20 w-24 shrink-0 overflow-hidden rounded-2xl bg-[#f5f5f7]">
                                     <x-product-visual :product="$p" />
@@ -77,7 +77,7 @@
 
                     <!-- Rekomendasi Apriori: Sering Dibeli Bersama -->
                     @if ($suggestions->isNotEmpty())
-                        <div class="mt-8 rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04]">
+                        <div class="mt-8 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04]">
                             <p class="text-xs font-bold uppercase tracking-widest text-[#0071e3]">Rekomendasi Algoritma Apriori</p>
                             <h3 class="mt-1 text-base font-bold text-[#1d1d1f]">Lengkapi Paket Anda agar Dapat Diskon Smart Bundle</h3>
                             <div class="mt-4 grid gap-3 sm:grid-cols-2">

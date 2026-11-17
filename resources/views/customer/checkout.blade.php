@@ -11,7 +11,7 @@
 
             <div class="space-y-6 lg:col-span-2">
                 <!-- Alamat Pengiriman -->
-                <div class="rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04]">
+                <div class="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04]">
                     <h2 class="text-base font-bold text-[#1d1d1f]">1. Alamat Pengiriman Lengkap</h2>
                     <p class="mt-1 text-xs text-[#86868b]">Cantumkan nama jalan, nomor rumah, kelurahan, kecamatan, dan nomor telepon penerima.</p>
 
@@ -25,7 +25,7 @@
                 </div>
 
                 <!-- Metode Pembayaran -->
-                <div class="rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04]">
+                <div class="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04]">
                     <h2 class="text-base font-bold text-[#1d1d1f]">2. Pilih Metode Pembayaran</h2>
 
                     <div class="mt-4 grid gap-3 sm:grid-cols-3">

@@ -30,13 +30,13 @@
                 x-show="sidebarOpen"
                 x-cloak
                 @click="sidebarOpen = false"
-                class="fixed inset-0 z-40 bg-black/50 backdrop-blur-xs lg:hidden"
+                class="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden"
             ></div>
 
             <!-- Dark Apple-Inspired Sidebar (#1d1d1f) -->
             <aside
                 :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
-                class="fixed inset-y-0 left-0 z-50 flex w-68 shrink-0 flex-col bg-[#1d1d1f] text-white transition-transform duration-200 lg:static"
+                class="fixed inset-y-0 left-0 z-50 flex w-64 shrink-0 flex-col bg-[#1d1d1f] text-white transition-transform duration-200 lg:static"
             >
                 <!-- Brand -->
                 <div class="flex h-16 items-center justify-between border-b border-white/10 px-6">
@@ -311,6 +311,60 @@
                 <main class="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
                     {{ $slot }}
                 </main>
+            </div>
+        </div>
+
+        <!-- Custom Apple/macOS-Style Confirmation Modal (pengganti window.confirm) -->
+        <div
+            x-data="{
+                open: false,
+                form: null,
+                title: '',
+                message: '',
+                confirmLabel: 'Ya, Lanjutkan',
+                ask(detail) {
+                    this.form = detail.form;
+                    this.title = detail.title || 'Konfirmasi Tindakan';
+                    this.message = detail.message || 'Apakah Anda yakin ingin melanjutkan?';
+                    this.confirmLabel = detail.confirmLabel || 'Ya, Lanjutkan';
+                    this.open = true;
+                    this.$nextTick(() => this.$refs.cancelBtn?.focus());
+                },
+                proceed() {
+                    const form = this.form;
+                    this.open = false;
+                    if (form) { form.querySelectorAll('[type=submit]').forEach(b => b.disabled = true); form.submit(); }
+                }
+            }"
+            @confirm-action.window="ask($event.detail)"
+            @keydown.escape.window="open = false"
+        >
+            <div x-show="open" x-cloak class="fixed inset-0 z-[80] flex items-center justify-center p-4" role="alertdialog" aria-modal="true">
+                <div
+                    x-show="open"
+                    x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                    x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                    @click="open = false"
+                    class="absolute inset-0 bg-black/40 backdrop-blur-sm"
+                ></div>
+                <div
+                    x-show="open"
+                    x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+                    x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
+                    class="relative w-full max-w-sm rounded-3xl bg-white/95 p-6 text-center shadow-[0_30px_80px_rgba(0,0,0,0.28)] ring-1 ring-black/[0.08] backdrop-blur-xl"
+                >
+                    <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-rose-50 ring-8 ring-rose-50/60">
+                        <svg class="h-7 w-7 text-rose-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                        </svg>
+                    </div>
+                    <h3 class="mt-4 text-base font-extrabold tracking-tight text-[#1d1d1f]" x-text="title"></h3>
+                    <p class="mt-2 text-xs leading-relaxed text-[#86868b]" x-text="message"></p>
+                    <div class="mt-6 grid grid-cols-2 gap-2">
+                        <button type="button" x-ref="cancelBtn" @click="open = false" class="rounded-full bg-[#f5f5f7] py-2.5 text-xs font-semibold text-[#1d1d1f] transition hover:bg-gray-200">Batal</button>
+                        <button type="button" @click="proceed()" class="rounded-full bg-rose-600 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-rose-700" x-text="confirmLabel"></button>
+                    </div>
+                </div>
             </div>
         </div>
     </body>

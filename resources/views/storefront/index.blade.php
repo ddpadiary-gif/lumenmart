@@ -5,6 +5,8 @@
             category: @js($activeCategory ?? 'all'),
             onlyFast: false,
             quickProduct: null,
+            qty: 1,
+            wishBusy: false,
             catalog: @js($catalog),
             matches(id, name, sku, catSlug, isFast) {
                 if (this.category !== 'all' && catSlug !== this.category) return false;
@@ -15,8 +17,32 @@
             },
             openQuickView(id) {
                 this.quickProduct = this.catalog.find(p => p.id === id) || null;
+                this.qty = 1;
+            },
+            stockPercent(p) {
+                const ref = Math.max((p.min_stock || 5) * 4, p.stock, 1);
+                return Math.max(4, Math.min(100, Math.round(p.stock / ref * 100)));
+            },
+            stepQty(delta) {
+                if (!this.quickProduct) return;
+                this.qty = Math.min(Math.max(1, this.qty + delta), Math.max(1, Math.min(99, this.quickProduct.stock)));
+            },
+            async quickAdd(form) {
+                const ok = await lumen.addToCart(form, this.qty);
+                if (ok) this.quickProduct = null;
+            },
+            async quickWish(form) {
+                if (this.wishBusy || !this.quickProduct) return;
+                this.wishBusy = true;
+                await lumen.toggleWishlist(form, this.quickProduct.id, this.quickProduct.name);
+                this.wishBusy = false;
+            },
+            syncWish(detail) {
+                const item = this.catalog.find(p => p.id === detail.id);
+                if (item) item.wishlisted = detail.wishlisted;
             }
         }"
+        @wishlist-updated.window="syncWish($event.detail)"
     >
         <!-- Apple-Inspired Full-Width Minimal Hero -->
         <section class="border-b border-black/[0.05] bg-white">
@@ -76,7 +102,7 @@
 
         <!-- Smart Bundle Apriori Section -->
         @if (count($bundles) > 0)
-            <section id="bundling" class="mx-auto max-w-7xl px-4 pt-16 sm:px-6 lg:px-8">
+            <section id="bundling" class="mx-auto max-w-7xl scroll-mt-20 px-4 pt-16 sm:px-6 lg:px-8">
                 <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
                     <div>
                         <p class="text-xs font-bold uppercase tracking-widest text-[#0071e3]">Market Basket Analysis &bull; Apriori</p>
@@ -128,7 +154,7 @@
 
                                 @auth
                                     @if (auth()->user()->isCustomer())
-                                        <form action="{{ route('cart.bundle', $rule) }}" method="POST">
+                                        <form action="{{ route('cart.bundle', $rule) }}" method="POST" @submit.prevent="lumen.addToCart($el)">
                                             @csrf
                                             <button
                                                 type="submit"
@@ -154,7 +180,7 @@
         @endif
 
         <!-- Katalog Produk Section -->
-        <section id="katalog" class="mx-auto max-w-7xl px-4 pt-16 sm:px-6 lg:px-8">
+        <section id="katalog" class="mx-auto max-w-7xl scroll-mt-20 px-4 pt-16 sm:px-6 lg:px-8">
             <div class="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
                 <div>
                     <p class="text-xs font-bold uppercase tracking-widest text-[#86868b]">Katalog Lengkap</p>
@@ -173,7 +199,7 @@
                             x-model="q"
                             type="search"
                             placeholder="Cari nama produk atau SKU..."
-                            class="w-full rounded-full border-0 bg-white py-2.5 pl-10 pr-4 text-xs text-[#1d1d1f] shadow-2xs ring-1 ring-black/[0.08] placeholder:text-[#86868b] focus:ring-2 focus:ring-[#0071e3]"
+                            class="w-full rounded-full border-0 bg-white py-2.5 pl-10 pr-4 text-xs text-[#1d1d1f] shadow-sm ring-1 ring-black/[0.08] placeholder:text-[#86868b] focus:ring-2 focus:ring-[#0071e3]"
                         />
                     </div>
 
@@ -194,7 +220,7 @@
                     type="button"
                     @click="category = 'all'"
                     :class="category === 'all' ? 'bg-[#1d1d1f] text-white' : 'bg-white text-[#1d1d1f] hover:bg-gray-100'"
-                    class="rounded-full px-4 py-2 text-xs font-semibold shadow-2xs ring-1 ring-black/[0.06] transition"
+                    class="rounded-full px-4 py-2 text-xs font-semibold shadow-sm ring-1 ring-black/[0.06] transition"
                 >
                     Semua Kategori ({{ $products->count() }})
                 </button>
@@ -203,7 +229,7 @@
                         type="button"
                         @click="category = '{{ $cat->slug }}'"
                         :class="category === '{{ $cat->slug }}' ? 'bg-[#1d1d1f] text-white' : 'bg-white text-[#1d1d1f] hover:bg-gray-100'"
-                        class="rounded-full px-4 py-2 text-xs font-semibold shadow-2xs ring-1 ring-black/[0.06] transition"
+                        class="rounded-full px-4 py-2 text-xs font-semibold shadow-sm ring-1 ring-black/[0.06] transition"
                     >
                         {{ $cat->name }} ({{ $cat->products_count }})
                     </button>
@@ -233,80 +259,147 @@
             </div>
         </section>
 
-        <!-- Quick View Modal (Alpine.js) -->
+        <!-- Apple-Style Split Product Modal (Quick View) -->
         <div
             x-show="quickProduct !== null"
             x-cloak
             @keydown.escape.window="quickProduct = null"
-            class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs"
+            class="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-4"
+            role="dialog"
+            aria-modal="true"
         >
             <div
+                x-show="quickProduct !== null"
+                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100"
+                x-transition:leave="transition ease-in duration-150"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
+                class="absolute inset-0 bg-black/45 backdrop-blur-sm"
+            ></div>
+
+            <div
+                x-show="quickProduct !== null"
+                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0 scale-95"
+                x-transition:enter-end="opacity-100 scale-100"
+                x-transition:leave="transition ease-in duration-150"
+                x-transition:leave-start="opacity-100 scale-100"
+                x-transition:leave-end="opacity-0 scale-95"
                 @click.outside="quickProduct = null"
-                class="w-full max-w-lg overflow-hidden rounded-3xl bg-white p-6 shadow-2xl ring-1 ring-black/[0.08]"
+                class="relative max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-t-3xl bg-white shadow-[0_30px_80px_rgba(0,0,0,0.25)] ring-1 ring-black/[0.08] sm:rounded-3xl"
             >
                 <template x-if="quickProduct">
-                    <div>
-                        <div class="flex items-start justify-between gap-4">
-                            <div>
-                                <span class="rounded-full bg-[#f5f5f7] px-3 py-1 text-[11px] font-semibold text-[#86868b]" x-text="quickProduct.category"></span>
-                                <h3 class="mt-2 text-xl font-extrabold tracking-tight text-[#1d1d1f]" x-text="quickProduct.name"></h3>
-                                <p class="text-xs text-[#86868b]">SKU: <span class="font-mono" x-text="quickProduct.sku"></span></p>
-                            </div>
-                            <button
-                                type="button"
-                                @click="quickProduct = null"
-                                class="rounded-full bg-[#f5f5f7] p-2 text-[#1d1d1f] hover:bg-gray-200"
-                            >
-                                &#10005;
-                            </button>
-                        </div>
+                    <div class="grid gap-0 sm:grid-cols-2">
+                        <!-- Kolom Kiri: Foto Produk -->
+                        <div class="p-5 sm:p-6 sm:pr-3">
+                            <div class="relative aspect-square w-full overflow-hidden rounded-2xl bg-[#f5f5f7]">
+                                <template x-if="quickProduct.image">
+                                    <img :src="quickProduct.image" :alt="quickProduct.name" class="aspect-square h-full w-full rounded-2xl bg-[#f5f5f7] object-cover">
+                                </template>
+                                <template x-if="!quickProduct.image">
+                                    <div class="flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-[#f5f5f7] to-[#e8e8ed]">
+                                        <span class="text-5xl font-extrabold tracking-tight text-[#1d1d1f]/80" x-text="quickProduct.initials"></span>
+                                        <span class="mt-2 text-xs font-medium text-[#86868b]" x-text="quickProduct.category"></span>
+                                    </div>
+                                </template>
 
-                        <p class="mt-4 text-sm leading-relaxed text-[#86868b]" x-text="quickProduct.description"></p>
-
-                        <div class="mt-5 grid grid-cols-3 gap-3 rounded-2xl bg-[#f5f5f7] p-4 text-xs">
-                            <div>
-                                <p class="text-[#86868b]">Harga Satuan</p>
-                                <p class="mt-0.5 text-sm font-bold text-[#1d1d1f]" x-text="quickProduct.price_label"></p>
-                            </div>
-                            <div>
-                                <p class="text-[#86868b]">Ketersediaan</p>
-                                <p class="mt-0.5 font-semibold text-[#1d1d1f]"><span x-text="quickProduct.stock"></span> <span x-text="quickProduct.unit"></span></p>
-                            </div>
-                            <div>
-                                <p class="text-[#86868b]">Klasifikasi</p>
-                                <p class="mt-0.5 font-semibold text-[#0071e3]" x-text="quickProduct.fast ? 'Fast-Moving' : 'Slow-Moving'"></p>
+                                <div class="absolute left-3 top-3 flex flex-wrap gap-1.5">
+                                    <span x-show="quickProduct.fast" class="rounded-full bg-[#1d1d1f]/85 px-2.5 py-1 text-[10px] font-semibold tracking-wide text-white backdrop-blur-md">Terlaris (Fast-Moving)</span>
+                                    <span x-show="quickProduct.stock <= 0" class="rounded-full bg-rose-600 px-2.5 py-1 text-[10px] font-semibold text-white">Stok Habis</span>
+                                    <span x-show="quickProduct.stock > 0 && quickProduct.critical" class="rounded-full bg-amber-500/90 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur-md">Stok Kritis</span>
+                                </div>
                             </div>
                         </div>
 
-                        @auth
-                            @if (auth()->user()->isCustomer())
-                                <form action="{{ route('cart.add') }}" method="POST" class="mt-6 flex items-center gap-3">
-                                    @csrf
-                                    <input type="hidden" name="product_id" :value="quickProduct.id">
-                                    <input
-                                        type="number"
-                                        name="quantity"
-                                        value="1"
-                                        min="1"
-                                        :max="quickProduct.stock"
-                                        class="w-24 rounded-full border-gray-300 text-center text-sm font-semibold focus:border-[#0071e3] focus:ring-[#0071e3]"
-                                    >
-                                    <button
-                                        type="submit"
-                                        :disabled="quickProduct.stock < 1"
-                                        class="flex-1 rounded-full bg-[#1d1d1f] py-3 text-xs font-semibold text-white transition hover:bg-[#0071e3] disabled:bg-gray-300"
-                                    >
-                                        + Tambah ke Keranjang
-                                    </button>
-                                </form>
-                            @endif
-                        @else
-                            <div class="mt-6">
-                                <a href="{{ route('login') }}" class="block w-full rounded-full bg-[#1d1d1f] py-3 text-center text-xs font-semibold text-white hover:bg-[#0071e3]">
-                                    Masuk untuk Membeli
-                                </a>
+                        <!-- Kolom Kanan: Detail Produk -->
+                        <div class="flex flex-col p-5 pt-0 sm:p-6 sm:pl-3">
+                            <div class="flex items-start justify-between gap-3">
+                                <span class="rounded-full bg-[#0071e3]/10 px-3 py-1 text-[11px] font-semibold text-[#0071e3]" x-text="quickProduct.category"></span>
+                                <button
+                                    type="button"
+                                    @click="quickProduct = null"
+                                    class="-mr-1 -mt-1 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#f5f5f7] text-sm text-[#1d1d1f] transition hover:bg-gray-200"
+                                    aria-label="Tutup"
+                                >&#10005;</button>
                             </div>
-                        @endauth
+
+                            <h3 class="mt-3 text-xl font-extrabold leading-tight tracking-tight text-[#1d1d1f] sm:text-2xl" x-text="quickProduct.name"></h3>
+                            <p class="mt-1 text-[11px] text-[#86868b]">SKU: <span class="font-mono" x-text="quickProduct.sku"></span></p>
+
+                            <p class="mt-3 text-sm leading-relaxed text-[#86868b]" x-text="quickProduct.description"></p>
+
+                            <div class="mt-4">
+                                <p class="text-3xl font-extrabold tracking-tight text-[#1d1d1f]" x-text="quickProduct.price_label"></p>
+                                <p class="text-[11px] text-[#86868b]">per <span x-text="quickProduct.unit"></span> &bull; <span x-text="quickProduct.fast ? 'Fast-Moving' : 'Slow-Moving'"></span></p>
+                            </div>
+
+                            <!-- Progress Ketersediaan Stok -->
+                            <div class="mt-4 rounded-2xl bg-[#f5f5f7] p-3.5">
+                                <div class="flex items-center justify-between text-[11px]">
+                                    <span class="font-medium text-[#86868b]">Ketersediaan Stok</span>
+                                    <span class="font-semibold" :class="quickProduct.stock <= 0 ? 'text-rose-600' : (quickProduct.critical ? 'text-amber-600' : 'text-emerald-600')">
+                                        <span x-text="quickProduct.stock"></span> <span x-text="quickProduct.unit"></span>
+                                    </span>
+                                </div>
+                                <div class="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-black/[0.08]">
+                                    <div
+                                        class="h-full rounded-full transition-all duration-500"
+                                        :class="quickProduct.stock <= 0 ? 'bg-rose-500' : (quickProduct.critical ? 'bg-amber-500' : 'bg-emerald-500')"
+                                        :style="`width: ${quickProduct.stock <= 0 ? 0 : stockPercent(quickProduct)}%`"
+                                    ></div>
+                                </div>
+                            </div>
+
+                            @auth
+                                @if (auth()->user()->isCustomer())
+                                    <form action="{{ route('cart.add') }}" method="POST" class="mt-5 space-y-3" @submit.prevent="quickAdd($el)">
+                                        @csrf
+                                        <input type="hidden" name="product_id" :value="quickProduct.id">
+                                        <input type="hidden" name="quantity" :value="qty">
+
+                                        <div class="flex items-center gap-3">
+                                            <div class="inline-flex items-center rounded-full bg-[#f5f5f7] p-1 ring-1 ring-black/[0.06]">
+                                                <button type="button" @click="stepQty(-1)" :disabled="qty <= 1" class="inline-flex h-8 w-8 items-center justify-center rounded-full text-base font-semibold text-[#1d1d1f] transition hover:bg-white disabled:opacity-30" aria-label="Kurangi">&minus;</button>
+                                                <span class="w-9 text-center text-sm font-bold tabular-nums text-[#1d1d1f]" x-text="qty"></span>
+                                                <button type="button" @click="stepQty(1)" :disabled="qty >= Math.min(99, quickProduct.stock)" class="inline-flex h-8 w-8 items-center justify-center rounded-full text-base font-semibold text-[#1d1d1f] transition hover:bg-white disabled:opacity-30" aria-label="Tambah">+</button>
+                                            </div>
+                                            <p class="text-[11px] text-[#86868b]">Subtotal <span class="font-semibold text-[#1d1d1f]" x-text="lumen.rupiah(quickProduct.price * qty)"></span></p>
+                                        </div>
+
+                                        <div class="flex items-center gap-2">
+                                            <button
+                                                type="submit"
+                                                :disabled="quickProduct.stock < 1"
+                                                class="flex-1 rounded-full bg-[#1d1d1f] py-3 text-xs font-semibold text-white transition hover:bg-[#0071e3] disabled:cursor-not-allowed disabled:bg-gray-300"
+                                            >
+                                                + Tambah ke Keranjang
+                                            </button>
+                                            <button
+                                                type="button"
+                                                @click="quickWish($refs.quickWishForm)"
+                                                :title="quickProduct.wishlisted ? 'Hapus dari Favorit' : 'Simpan ke Favorit'"
+                                                class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#f5f5f7] ring-1 ring-black/[0.06] transition hover:scale-105 active:scale-95"
+                                            >
+                                                <svg class="h-5 w-5 transition-colors" :class="quickProduct.wishlisted ? 'fill-rose-500 text-rose-500' : 'fill-none text-[#1d1d1f]'" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </form>
+                                    <form x-ref="quickWishForm" :action="'{{ url('/wishlist') }}/' + quickProduct.id" method="POST" class="hidden">
+                                        @csrf
+                                    </form>
+                                @endif
+                            @else
+                                <div class="mt-5">
+                                    <a href="{{ route('login') }}" class="block w-full rounded-full bg-[#1d1d1f] py-3 text-center text-xs font-semibold text-white hover:bg-[#0071e3]">
+                                        Masuk untuk Membeli
+                                    </a>
+                                </div>
+                            @endauth
+                        </div>
                     </div>
                 </template>
             </div>

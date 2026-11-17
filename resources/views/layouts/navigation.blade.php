@@ -59,11 +59,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z" />
                             </svg>
                             <span>Keranjang</span>
-                            @if (($cartCount ?? 0) > 0)
-                                <span class="inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-[#0071e3] px-1.5 text-[10px] font-bold text-white">
-                                    {{ $cartCount }}
-                                </span>
-                            @endif
+                            <span x-show="$store.cart.count > 0" x-text="$store.cart.count" @if (($cartCount ?? 0) < 1) style="display: none" @endif class="inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-[#0071e3] px-1.5 text-[10px] font-bold text-white">{{ $cartCount ?? 0 }}</span>
                         </a>
                     @endif
 
@@ -131,11 +127,7 @@
                             <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z" />
                             </svg>
-                            @if (($cartCount ?? 0) > 0)
-                                <span class="absolute -right-1 -top-1 inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-[#0071e3] px-1 text-[10px] font-bold text-white">
-                                    {{ $cartCount }}
-                                </span>
-                            @endif
+                            <span x-show="$store.cart.count > 0" x-text="$store.cart.count" @if (($cartCount ?? 0) < 1) style="display: none" @endif class="absolute -right-1 -top-1 inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-[#0071e3] px-1 text-[10px] font-bold text-white">{{ $cartCount ?? 0 }}</span>
                         </a>
                     @endif
                 @endauth
@@ -161,7 +153,7 @@
             @auth
                 @if (auth()->user()->isCustomer())
                     <a href="{{ route('wishlist.index') }}" class="block rounded-xl px-3 py-2 text-sm font-medium text-[#1d1d1f] hover:bg-[#f5f5f7]">Favorit</a>
-                    <a href="{{ route('cart.index') }}" class="block rounded-xl px-3 py-2 text-sm font-medium text-[#1d1d1f] hover:bg-[#f5f5f7]">Keranjang ({{ $cartCount ?? 0 }})</a>
+                    <a href="{{ route('cart.index') }}" class="block rounded-xl px-3 py-2 text-sm font-medium text-[#1d1d1f] hover:bg-[#f5f5f7]">Keranjang (<span x-text="$store.cart.count">{{ $cartCount ?? 0 }}</span>)</a>
                     <a href="{{ route('orders.index') }}" class="block rounded-xl px-3 py-2 text-sm font-medium text-[#1d1d1f] hover:bg-[#f5f5f7]">Pesanan Saya</a>
                 @else
                     <a href="{{ route('backoffice.dashboard') }}" class="block rounded-xl bg-[#1d1d1f] px-3 py-2 text-sm font-semibold text-white">Buka Back-Office</a>

@@ -68,7 +68,7 @@
     >
         <!-- Area Pemilihan Produk -->
         <div class="space-y-4 lg:col-span-2">
-            <div class="rounded-3xl bg-white p-5 shadow-2xs ring-1 ring-black/[0.04]">
+            <div class="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/[0.04]">
                 <div class="flex flex-col gap-3 sm:flex-row">
                     <input
                         x-model="q"
@@ -107,7 +107,7 @@
             </div>
 
             <!-- Riwayat POS Terbaru -->
-            <div class="rounded-3xl bg-white p-5 shadow-2xs ring-1 ring-black/[0.04]">
+            <div class="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/[0.04]">
                 <h3 class="text-sm font-bold text-[#1d1d1f]">Transaksi POS Terbaru</h3>
                 <div class="mt-3 divide-y divide-black/[0.05] text-xs">
                     @foreach ($recentPos as $pos)
@@ -130,7 +130,12 @@
 
         <!-- Panel Keranjang Kasir -->
         <div>
-            <form action="{{ route('backoffice.pos.store') }}" method="POST" class="sticky top-24 rounded-3xl bg-white p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] ring-1 ring-black/[0.05]">
+            <form
+                action="{{ route('backoffice.pos.store') }}"
+                method="POST"
+                @submit="try { sessionStorage.setItem('lm_pos_cash', paymentMethod === 'tunai' ? String(Number(cashReceived) || 0) : '0') } catch (e) {}"
+                class="sticky top-24 rounded-3xl bg-white p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] ring-1 ring-black/[0.05]"
+            >
                 @csrf
                 <div class="flex items-center justify-between">
                     <h2 class="text-base font-extrabold text-[#1d1d1f]">Keranjang Kasir</h2>
@@ -235,4 +240,87 @@
             </form>
         </div>
     </div>
+
+    @if ($lastTransaction)
+        <!-- Modal Konfirmasi Sukses & Preview Struk POS -->
+        <div
+            x-data="{
+                open: true,
+                cash: 0,
+                total: {{ (float) $lastTransaction->total_amount }},
+                init() {
+                    try { this.cash = Number(sessionStorage.getItem('lm_pos_cash') || 0); sessionStorage.removeItem('lm_pos_cash'); } catch (e) {}
+                },
+                rp(v) { return 'Rp ' + new Intl.NumberFormat('id-ID').format(Math.round(v)); }
+            }"
+            x-show="open"
+            x-cloak
+            @keydown.escape.window="open = false"
+            class="fixed inset-0 z-50 flex items-center justify-center p-4"
+            role="dialog"
+            aria-modal="true"
+        >
+            <div
+                x-show="open"
+                x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                @click="open = false"
+                class="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            ></div>
+
+            <div
+                x-show="open"
+                x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+                x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
+                class="relative w-full max-w-sm overflow-hidden rounded-3xl bg-white shadow-[0_30px_80px_rgba(0,0,0,0.28)] ring-1 ring-black/[0.08]"
+            >
+                <div class="px-6 pt-6 text-center">
+                    <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 ring-8 ring-emerald-50/60">
+                        <svg class="h-7 w-7 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+                    </div>
+                    <h3 class="mt-4 text-base font-extrabold tracking-tight text-[#1d1d1f]">Transaksi POS Berhasil</h3>
+                    <p class="mt-1 font-mono text-xs text-[#86868b]">{{ $lastTransaction->invoice_number }} &bull; {{ $lastTransaction->paymentLabel() }}</p>
+                </div>
+
+                <!-- Preview Struk -->
+                <div class="mx-6 mt-5 rounded-2xl bg-[#f5f5f7] p-4 font-mono text-[11px] text-[#1d1d1f]">
+                    <p class="text-center text-xs font-bold tracking-widest">LUMEN MART</p>
+                    <p class="text-center text-[10px] text-[#86868b]">{{ ($lastTransaction->created_at ?? now())->translatedFormat('d M Y, H:i') }}</p>
+                    <div class="my-2 border-t border-dashed border-black/20"></div>
+                    <div class="max-h-40 space-y-1.5 overflow-y-auto">
+                        @foreach ($lastTransaction->details as $d)
+                            <div>
+                                <p class="truncate font-semibold">{{ $d->product?->name ?? 'Produk' }}</p>
+                                <div class="flex justify-between text-[#86868b]">
+                                    <span>{{ $d->quantity }} x {{ rupiah($d->unit_price) }}</span>
+                                    <span class="text-[#1d1d1f]">{{ rupiah($d->subtotal) }}</span>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                    <div class="my-2 border-t border-dashed border-black/20"></div>
+                    @if ($lastTransaction->discount_amount > 0)
+                        <div class="flex justify-between text-emerald-700"><span>Diskon Smart Bundle</span><span>-{{ rupiah($lastTransaction->discount_amount) }}</span></div>
+                    @endif
+                    <div class="flex justify-between text-xs font-bold"><span>TOTAL</span><span>{{ rupiah($lastTransaction->total_amount) }}</span></div>
+                    <template x-if="cash > 0">
+                        <div class="mt-1 space-y-0.5 text-[#86868b]">
+                            <div class="flex justify-between"><span>Tunai</span><span x-text="rp(cash)"></span></div>
+                            <div class="flex justify-between font-semibold text-emerald-700"><span>Kembalian</span><span x-text="rp(Math.max(0, cash - total))"></span></div>
+                        </div>
+                    </template>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 p-6">
+                    <a href="{{ route('invoices.pdf', $lastTransaction) }}" target="_blank" class="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#1d1d1f] py-3 text-xs font-semibold text-white transition hover:bg-[#0071e3]">
+                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z" /></svg>
+                        Cetak / Unduh Struk PDF
+                    </a>
+                    <button type="button" @click="open = false" class="rounded-full bg-[#f5f5f7] py-3 text-xs font-semibold text-[#1d1d1f] transition hover:bg-gray-200">
+                        Transaksi Baru
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
 </x-admin-layout>

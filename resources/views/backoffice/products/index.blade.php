@@ -1,5 +1,5 @@
 <x-admin-layout title="Katalog Produk" heading="Manajemen Katalog Produk">
-    <div class="flex flex-col justify-between gap-4 rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04] lg:flex-row lg:items-center">
+    <div class="flex flex-col justify-between gap-4 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04] lg:flex-row lg:items-center">
         <form method="GET" action="{{ route('backoffice.products.index') }}" class="flex flex-1 flex-wrap items-center gap-2.5">
             <input
                 type="search"
@@ -34,7 +34,7 @@
         </a>
     </div>
 
-    <div class="mt-6 rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04]">
+    <div class="mt-6 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04]">
         <div class="overflow-x-auto">
             <table class="w-full text-left text-xs">
                 <thead>
@@ -91,7 +91,7 @@
                                     >
                                         Edit
                                     </a>
-                                    <form action="{{ route('backoffice.products.destroy', $product) }}" method="POST" onsubmit="return confirm('Hapus/nonaktifkan produk ini?');">
+                                    <form action="{{ route('backoffice.products.destroy', $product) }}" method="POST" @submit.prevent="$dispatch('confirm-action', { form: $el, title: 'Hapus Produk Ini?', message: @js('Produk '.$product->name.' akan dihapus atau dinonaktifkan dari katalog. Riwayat transaksi tetap tersimpan untuk analitik.'), confirmLabel: 'Ya, Hapus Produk' })">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="rounded-full bg-rose-50 px-3 py-1 text-[11px] font-semibold text-rose-600 hover:bg-rose-100">

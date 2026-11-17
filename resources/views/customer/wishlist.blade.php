@@ -12,7 +12,7 @@
         </div>
 
         @if ($products->isEmpty())
-            <div class="mt-10 rounded-3xl bg-white p-12 text-center shadow-2xs ring-1 ring-black/[0.04]">
+            <div class="mt-10 rounded-3xl bg-white p-12 text-center shadow-sm ring-1 ring-black/[0.04]">
                 <p class="text-base font-bold text-[#1d1d1f]">Belum ada produk di daftar Favorit Anda.</p>
                 <p class="mt-1 text-xs text-[#86868b]">Klik ikon hati pada kartu produk di katalog untuk menyimpannya di sini.</p>
                 <a href="{{ route('home') }}#katalog" class="mt-6 inline-block rounded-full bg-[#0071e3] px-6 py-2.5 text-xs font-semibold text-white">

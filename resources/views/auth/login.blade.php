@@ -11,21 +11,21 @@
             <button
                 type="button"
                 onclick="document.getElementById('email').value='admin@lumenmart.test';document.getElementById('password').value='password';"
-                class="rounded-xl bg-white px-2.5 py-2 font-semibold text-[#1d1d1f] shadow-2xs ring-1 ring-black/[0.06] transition hover:bg-[#1d1d1f] hover:text-white"
+                class="rounded-xl bg-white px-2.5 py-2 font-semibold text-[#1d1d1f] shadow-sm ring-1 ring-black/[0.06] transition hover:bg-[#1d1d1f] hover:text-white"
             >
                 Admin
             </button>
             <button
                 type="button"
                 onclick="document.getElementById('email').value='pemilik@lumenmart.test';document.getElementById('password').value='password';"
-                class="rounded-xl bg-white px-2.5 py-2 font-semibold text-[#1d1d1f] shadow-2xs ring-1 ring-black/[0.06] transition hover:bg-[#1d1d1f] hover:text-white"
+                class="rounded-xl bg-white px-2.5 py-2 font-semibold text-[#1d1d1f] shadow-sm ring-1 ring-black/[0.06] transition hover:bg-[#1d1d1f] hover:text-white"
             >
                 Pemilik
             </button>
             <button
                 type="button"
                 onclick="document.getElementById('email').value='pelanggan@lumenmart.test';document.getElementById('password').value='password';"
-                class="rounded-xl bg-white px-2.5 py-2 font-semibold text-[#1d1d1f] shadow-2xs ring-1 ring-black/[0.06] transition hover:bg-[#0071e3] hover:text-white"
+                class="rounded-xl bg-white px-2.5 py-2 font-semibold text-[#1d1d1f] shadow-sm ring-1 ring-black/[0.06] transition hover:bg-[#0071e3] hover:text-white"
             >
                 Pelanggan
             </button>
@@ -55,7 +55,7 @@
         <!-- Remember Me -->
         <div class="mt-4 flex items-center justify-between">
             <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-[#0071e3] shadow-2xs focus:ring-[#0071e3]" name="remember">
+                <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-[#0071e3] shadow-sm focus:ring-[#0071e3]" name="remember">
                 <span class="ms-2 text-xs text-[#86868b]">{{ __('Ingat saya') }}</span>
             </label>
 

@@ -42,6 +42,35 @@ class RegressionController extends Controller
             $detail['actual'] = $series;
         }
 
+        // Data JSON seluruh produk agar grafik & metrik dapat berganti instan tanpa reload (Chart.js update()).
+        $regressionData = [];
+        foreach ($predictions as $row) {
+            $prod = $row->product;
+            if (! $prod) {
+                continue;
+            }
+            $series = $matrix[$prod->id] ?? array_fill(0, count($months), 0);
+            $analysis = $regression->analyze($series, (int) $prod->current_stock);
+            $regressionData[$prod->id] = [
+                'id' => $prod->id,
+                'name' => $prod->name,
+                'sku' => $prod->sku,
+                'unit' => $prod->unit,
+                'category' => $prod->category?->name,
+                'fast' => $prod->isFastMoving(),
+                'actual' => array_map('floatval', array_values($series)),
+                'fitted' => $analysis['fitted'],
+                'equation' => $analysis['equation'],
+                'r_squared' => round($analysis['r_squared'], 4),
+                'mae' => round($analysis['mae'], 2),
+                'rmse' => round($analysis['rmse'], 2),
+                'predicted' => round($analysis['predicted_demand'], 2),
+                'safety_stock' => $analysis['safety_stock'],
+                'restock' => $analysis['restock_recommendation'],
+                'stock' => (int) $prod->current_stock,
+            ];
+        }
+
         $fastPredictions = $predictions->filter(fn ($p) => $p->product?->movement_type === 'fast_moving');
         $avgFastR2 = (float) $fastPredictions->avg('r_squared');
         $avgFastMae = (float) $fastPredictions->avg('mae');
@@ -58,6 +87,7 @@ class RegressionController extends Controller
             'avgFastMae',
             'avgFastRmse',
             'totalRestockUnits',
+            'regressionData',
         ));
     }
 

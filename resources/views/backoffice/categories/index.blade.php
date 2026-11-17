@@ -1,7 +1,7 @@
 <x-admin-layout title="Kategori Produk" heading="Manajemen Kategori Produk">
     <div class="grid gap-6 lg:grid-cols-3">
         <!-- Form Tambah Kategori -->
-        <div class="rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04]">
+        <div class="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04]">
             <h2 class="text-base font-bold text-[#1d1d1f]">Tambah Kategori Baru</h2>
             <p class="mt-1 text-xs text-[#86868b]">Folder lokal <code class="rounded bg-[#f5f5f7] px-1.5 py-0.5">public/assets/products/&lt;slug&gt;</code> otomatis disiapkan.</p>
 
@@ -36,7 +36,7 @@
         </div>
 
         <!-- Daftar Kategori -->
-        <div class="rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04] lg:col-span-2">
+        <div class="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04] lg:col-span-2">
             <h2 class="text-base font-bold text-[#1d1d1f]">Daftar Kategori ({{ $categories->count() }})</h2>
 
             <div class="mt-4 divide-y divide-black/[0.05]">
@@ -65,7 +65,7 @@
                                     Edit
                                 </button>
                                 @if ($category->products_count === 0)
-                                    <form action="{{ route('backoffice.categories.destroy', $category) }}" method="POST" onsubmit="return confirm('Hapus kategori ini?');">
+                                    <form action="{{ route('backoffice.categories.destroy', $category) }}" method="POST" @submit.prevent="$dispatch('confirm-action', { form: $el, title: 'Hapus Kategori Ini?', message: @js('Kategori '.$category->name.' akan dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.'), confirmLabel: 'Ya, Hapus Kategori' })">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="rounded-full bg-rose-50 px-3.5 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-100">

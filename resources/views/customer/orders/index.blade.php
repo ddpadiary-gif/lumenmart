@@ -12,7 +12,7 @@
         </div>
 
         @if ($orders->isEmpty())
-            <div class="mt-10 rounded-3xl bg-white p-12 text-center shadow-2xs ring-1 ring-black/[0.04]">
+            <div class="mt-10 rounded-3xl bg-white p-12 text-center shadow-sm ring-1 ring-black/[0.04]">
                 <p class="text-base font-bold text-[#1d1d1f]">Anda belum memiliki pesanan E-Commerce.</p>
                 <a href="{{ route('home') }}#katalog" class="mt-4 inline-block rounded-full bg-[#0071e3] px-6 py-2.5 text-xs font-semibold text-white">
                     Mulai Belanja
@@ -21,7 +21,7 @@
         @else
             <div class="mt-8 space-y-4">
                 @foreach ($orders as $order)
-                    <div class="flex flex-col justify-between gap-4 rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04] sm:flex-row sm:items-center">
+                    <div class="flex flex-col justify-between gap-4 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04] sm:flex-row sm:items-center">
                         <div>
                             <div class="flex flex-wrap items-center gap-2">
                                 <span class="font-mono text-sm font-bold text-[#1d1d1f]">{{ $order->invoice_number }}</span>

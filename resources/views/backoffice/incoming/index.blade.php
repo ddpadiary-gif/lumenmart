@@ -1,7 +1,7 @@
 <x-admin-layout title="Barang Masuk (Restock)" heading="Transaksi Barang Masuk (Restock)">
     <div class="grid gap-6 lg:grid-cols-3">
         <!-- Form Restock -->
-        <div class="rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04]">
+        <div class="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04]">
             <h2 class="text-base font-bold text-[#1d1d1f]">Catat Barang Masuk (Restock)</h2>
             <p class="mt-1 text-xs text-[#86868b]">Stok produk otomatis bertambah setelah transaksi disimpan.</p>
 
@@ -51,7 +51,7 @@
         </div>
 
         <!-- Riwayat Barang Masuk -->
-        <div class="rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04] lg:col-span-2">
+        <div class="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04] lg:col-span-2">
             <h2 class="text-base font-bold text-[#1d1d1f]">Riwayat Barang Masuk Terbaru</h2>
 
             <div class="mt-4 overflow-x-auto">

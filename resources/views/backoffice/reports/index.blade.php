@@ -1,6 +1,6 @@
 <x-admin-layout title="Laporan Penjualan & Stok" heading="Laporan Penjualan, Inventori & Ekspor (CSV / PDF)">
     <!-- Filter & Tombol Ekspor -->
-    <div class="flex flex-col justify-between gap-4 rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04] lg:flex-row lg:items-end">
+    <div class="flex flex-col justify-between gap-4 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04] lg:flex-row lg:items-end">
         <form method="GET" action="{{ route('backoffice.reports.index') }}" class="flex flex-wrap items-end gap-3">
             <div>
                 <label class="block text-[10px] font-bold uppercase text-[#86868b]">Dari Tanggal</label>
@@ -47,26 +47,26 @@
 
     <!-- Ringkasan Periode -->
     <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-4">
-        <div class="rounded-3xl bg-white p-5 shadow-2xs ring-1 ring-black/[0.04]">
+        <div class="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/[0.04]">
             <p class="text-[11px] font-semibold uppercase text-[#86868b]">Omzet Periode Terpilih</p>
             <p class="mt-1 text-xl font-extrabold text-[#1d1d1f]">{{ rupiah($totalRevenue) }}</p>
         </div>
-        <div class="rounded-3xl bg-white p-5 shadow-2xs ring-1 ring-black/[0.04]">
+        <div class="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/[0.04]">
             <p class="text-[11px] font-semibold uppercase text-[#86868b]">Total Diskon Smart Bundle</p>
             <p class="mt-1 text-xl font-extrabold text-emerald-700">{{ rupiah($totalDiscount) }}</p>
         </div>
-        <div class="rounded-3xl bg-white p-5 shadow-2xs ring-1 ring-black/[0.04]">
+        <div class="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/[0.04]">
             <p class="text-[11px] font-semibold uppercase text-[#86868b]">Jumlah Transaksi</p>
             <p class="mt-1 text-xl font-extrabold text-[#1d1d1f]">{{ number_format($totalTransactions, 0, ',', '.') }}</p>
         </div>
-        <div class="rounded-3xl bg-white p-5 shadow-2xs ring-1 ring-black/[0.04]">
+        <div class="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/[0.04]">
             <p class="text-[11px] font-semibold uppercase text-[#86868b]">Nilai Aset Stok Gudang</p>
             <p class="mt-1 text-xl font-extrabold text-[#0071e3]">{{ rupiah($inventoryValue) }}</p>
         </div>
     </div>
 
     <!-- Tabel Transaksi Penjualan -->
-    <div class="mt-6 rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04]">
+    <div class="mt-6 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04]">
         <h3 class="text-base font-bold text-[#1d1d1f]">Rincian Transaksi Penjualan</h3>
         <div class="mt-4 overflow-x-auto">
             <table class="w-full text-left text-xs">

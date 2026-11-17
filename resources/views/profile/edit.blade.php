@@ -5,19 +5,19 @@
             <h1 class="mt-1 text-3xl font-extrabold tracking-tight text-[#1d1d1f]">Profil Pengguna</h1>
         </div>
 
-        <div class="rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04] sm:p-8">
+        <div class="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04] sm:p-8">
             <div class="max-w-xl">
                 @include('profile.partials.update-profile-information-form')
             </div>
         </div>
 
-        <div class="rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04] sm:p-8">
+        <div class="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04] sm:p-8">
             <div class="max-w-xl">
                 @include('profile.partials.update-password-form')
             </div>
         </div>
 
-        <div class="rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04] sm:p-8">
+        <div class="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04] sm:p-8">
             <div class="max-w-xl">
                 @include('profile.partials.delete-user-form')
             </div>

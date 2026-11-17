@@ -1,6 +1,6 @@
 <x-admin-layout title="Pesanan E-Commerce" heading="Manajemen Status Pesanan E-Commerce">
     <!-- Filter Status -->
-    <div class="flex flex-col justify-between gap-4 rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04] lg:flex-row lg:items-center">
+    <div class="flex flex-col justify-between gap-4 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04] lg:flex-row lg:items-center">
         <div class="flex flex-wrap items-center gap-2">
             <a
                 href="{{ route('backoffice.orders.index') }}"
@@ -30,7 +30,7 @@
         </form>
     </div>
 
-    <div class="mt-6 rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04]">
+    <div class="mt-6 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04]">
         <div class="overflow-x-auto">
             <table class="w-full text-left text-xs">
                 <thead>

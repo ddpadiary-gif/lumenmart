@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AprioriRule;
 use App\Models\Product;
 use App\Services\CartService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -38,7 +39,7 @@ class CartController extends Controller
         return view('customer.cart', compact('summary', 'suggestions'));
     }
 
-    public function add(Request $request): RedirectResponse
+    public function add(Request $request): RedirectResponse|JsonResponse
     {
         $data = $request->validate([
             'product_id' => ['required', 'integer', 'exists:products,id'],
@@ -47,15 +48,24 @@ class CartController extends Controller
 
         $product = Product::active()->findOrFail($data['product_id']);
         if ($product->current_stock < 1) {
-            return back()->with('error', "Maaf, {$product->name} sedang habis.");
+            $message = "Maaf, {$product->name} sedang habis.";
+
+            return $request->expectsJson()
+                ? response()->json(['message' => $message, 'cartCount' => $this->cart->count()], 422)
+                : back()->with('error', $message);
         }
 
         $this->cart->add($product, $data['quantity'] ?? 1);
+        $message = "{$product->name} ditambahkan ke keranjang.";
+
+        if ($request->expectsJson()) {
+            return $this->jsonCart($message);
+        }
 
         return back()->with('status', "{$product->name} masuk ke keranjang.");
     }
 
-    public function addBundle(AprioriRule $rule): RedirectResponse
+    public function addBundle(Request $request, AprioriRule $rule): RedirectResponse|JsonResponse
     {
         $products = Product::active()->whereIn('id', $rule->productIds())->get();
         foreach ($products as $product) {
@@ -64,7 +74,31 @@ class CartController extends Controller
             }
         }
 
+        if ($request->expectsJson()) {
+            return $this->jsonCart('Paket bundling ditambahkan. Diskon Smart Bundle otomatis diterapkan!');
+        }
+
         return redirect()->route('cart.index')->with('status', 'Paket bundling ditambahkan. Diskon Smart Bundle otomatis diterapkan!');
+    }
+
+    /** Respons JSON ringkas untuk interaksi AJAX (badge keranjang, toast, mini cart). */
+    private function jsonCart(string $message): JsonResponse
+    {
+        $summary = $this->cart->summary();
+        $summary['lines'] = array_map(fn ($line) => [
+            'id' => $line['product']->id,
+            'name' => $line['product']->name,
+            'image' => $line['product']->imageUrl(),
+            'price' => (float) $line['product']->selling_price,
+            'quantity' => $line['qty'],
+            'subtotal' => $line['subtotal'],
+        ], $summary['lines']);
+
+        return response()->json([
+            'message' => $message,
+            'cartCount' => $this->cart->count(),
+            'summary' => $summary,
+        ]);
     }
 
     public function update(Request $request, Product $product): RedirectResponse

@@ -2,7 +2,7 @@
     @php $isAdmin = auth()->user()->isAdmin(); @endphp
 
     <!-- Header & Form Parameter Apriori -->
-    <div class="flex flex-col justify-between gap-4 rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04] lg:flex-row lg:items-center">
+    <div class="flex flex-col justify-between gap-4 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04] lg:flex-row lg:items-center">
         <div>
             <p class="text-xs font-bold uppercase tracking-widest text-[#0071e3]">Frequent Itemset Mining (L1, L2, L3) &bull; Lift Ratio &gt; 1.0</p>
             <h2 class="mt-1 text-2xl font-extrabold tracking-tight text-[#1d1d1f]">
@@ -52,7 +52,7 @@
 
     <!-- Grafik Lift Ratio & Confidence -->
     @if ($rules->isNotEmpty())
-        <div class="mt-6 rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04]">
+        <div class="mt-6 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04]">
             <h3 class="text-base font-bold text-[#1d1d1f]">Perbandingan Confidence (%) &amp; Lift Ratio Aturan Teratas</h3>
             <div class="mt-4 h-72">
                 <canvas id="aprioriChart"></canvas>
@@ -61,7 +61,7 @@
     @endif
 
     <!-- Tabel Lengkap Aturan Apriori -->
-    <div class="mt-6 rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04]">
+    <div class="mt-6 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04]">
         <h3 class="text-base font-bold text-[#1d1d1f]">Daftar Aturan Asosiasi ({{ $rules->count() }} Aturan dengan Lift &gt; 1.0)</h3>
 
         <div class="mt-4 overflow-x-auto">
