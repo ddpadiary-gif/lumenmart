@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>LUMEN MART — Smart Daily Essentials, Intelligently Stocked</title>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS + Chart.js + Alpine.js -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                }
+            }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+
+    <style>
+        html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body x-data="lumenMartApp()" x-init="init()" class="min-h-screen bg-[#f5f5f7] font-sans text-[#1d1d1f] antialiased selection:bg-[#0071e3] selection:text-white">
+
+    <!-- Toast Notification -->
+    <div x-show="toast" x-cloak x-transition class="fixed bottom-5 right-5 z-50 max-w-md rounded-2xl bg-[#1d1d1f] px-5 py-3.5 text-xs font-semibold text-white shadow-2xl ring-1 ring-white/15">
+        <span x-text="toast"></span>
+    </div>
+
+    <!-- Top Role Switcher Strip (Demo Mode Switcher) -->
+    <div class="bg-[#1d1d1f] text-white">
+        <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 px-4 py-2 text-[11px] sm:px-6 lg:px-8">
+            <div class="flex items-center gap-2">
+                <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
+                <span class="font-semibold">LUMEN MART Live Web App</span>
+                <span class="hidden text-white/60 sm:inline">&bull; Laravel 13 + Regresi Linear (OLS 80:20) + Algoritma Apriori</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+                <span class="text-white/60">Peran Aktif:</span>
+                <button @click="switchRole('customer')" :class="role === 'customer' ? 'bg-[#0071e3] text-white' : 'bg-white/10 text-white/80 hover:bg-white/20'" class="rounded-full px-3 py-0.5 font-semibold transition">
+                    Pelanggan (Storefront)
+                </button>
+                <button @click="switchRole('admin')" :class="role === 'admin' ? 'bg-[#0071e3] text-white' : 'bg-white/10 text-white/80 hover:bg-white/20'" class="rounded-full px-3 py-0.5 font-semibold transition">
+                    Admin (Full Back-Office)
+                </button>
+                <button @click="switchRole('pemilik')" :class="role === 'pemilik' ? 'bg-[#0071e3] text-white' : 'bg-white/10 text-white/80 hover:bg-white/20'" class="rounded-full px-3 py-0.5 font-semibold transition">
+                    Pemilik (Read-Only Analitik)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ====================================================================== -->
+    <!-- MODE 1: STOREFRONT & PELANGGAN                                          -->
+    <!-- ====================================================================== -->
+    <div x-show="area === 'storefront'" class="flex min-h-screen flex-col">
+        <!-- Navbar Storefront -->
+        <nav class="sticky top-0 z-40 border-b border-black/[0.06] bg-white/85 backdrop-blur-xl">
+            <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center gap-8">
+                    <button @click="page = 'catalog'" class="inline-flex items-center gap-2.5 text-left">
+                        <span class="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-[#1d1d1f] text-white">
+                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 12l8-4.5M12 12v9M12 12L4 7.5" />
+                            </svg>
+                        </span>
+                        <span class="flex flex-col leading-none">
+                            <span class="text-base font-bold tracking-tight text-[#1d1d1f]">LUMEN MART</span>
+                            <span class="text-[10px] font-medium uppercase tracking-wider text-[#86868b]">Smart Retail</span>
+                        </span>
+                    </button>
+
+                    <div class="hidden items-center gap-6 md:flex">
+                        <button @click="page = 'catalog'" :class="page === 'catalog' ? 'text-[#0071e3] font-semibold' : 'text-[#1d1d1f]/80'" class="text-xs font-medium hover:text-[#1d1d1f]">Katalog 30 Produk</button>
+                        <a href="#bundling" @click="page = 'catalog'" class="text-xs font-medium text-[#1d1d1f]/80 hover:text-[#0071e3]">Paket Bundling Hemat</a>
+                        <button @click="page = 'wishlist'" :class="page === 'wishlist' ? 'text-[#0071e3] font-semibold' : 'text-[#1d1d1f]/80'" class="text-xs font-medium hover:text-[#1d1d1f]">
+                            Favorit (<span x-text="wishlist.length"></span>)
+                        </button>
+                        <button @click="page = 'orders'" :class="page === 'orders' ? 'text-[#0071e3] font-semibold' : 'text-[#1d1d1f]/80'" class="text-xs font-medium hover:text-[#1d1d1f]">
+                            Pesanan Saya (<span x-text="myOrders.length"></span>)
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2.5">
+                    <button @click="page = 'cart'" class="relative inline-flex items-center gap-2 rounded-full bg-[#f5f5f7] px-4 py-2 text-xs font-semibold text-[#1d1d1f] transition hover:bg-gray-200">
+                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z" />
+                        </svg>
+                        <span>Keranjang</span>
+                        <span x-show="cartCount() > 0" x-text="cartCount()" class="inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-[#0071e3] px-1.5 text-[10px] font-bold text-white"></span>
+                    </button>
+
+                    <button @click="switchRole('admin')" class="hidden rounded-full bg-[#1d1d1f] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#0071e3] sm:inline-flex">
+                        Buka Back-Office &rarr;
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- PAGE: CATALOG & HERO -->
+        <div x-show="page === 'catalog'">
+            <!-- Hero -->
+            <section class="border-b border-black/[0.05] bg-white">
+                <div class="mx-auto max-w-7xl px-4 py-14 text-center sm:px-6 sm:py-20 lg:px-8">
+                    <span class="inline-flex items-center gap-2 rounded-full bg-[#f5f5f7] px-4 py-1.5 text-xs font-semibold tracking-tight text-[#1d1d1f]">
+                        <span class="h-2 w-2 rounded-full bg-[#0071e3]"></span>
+                        <span>LUMEN MART &mdash; Smart Daily Essentials, Intelligently Stocked</span>
+                    </span>
+                    <h1 class="mx-auto mt-6 max-w-4xl text-4xl font-extrabold tracking-tight text-[#1d1d1f] sm:text-6xl lg:leading-[1.08]">
+                        Belanja Kebutuhan Harian.<br class="hidden sm:inline" />
+                        <span class="text-[#86868b]">Lebih Cerdas, Selalu Tersedia.</span>
+                    </h1>
+                    <p class="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-[#86868b]">
+                        Katalog kurasi 30 produk kebutuhan pokok rumah tangga dengan stok yang dijaga oleh prediksi
+                        <strong class="font-semibold text-[#1d1d1f]">Regresi Linear (OLS)</strong> dan rekomendasi hemat otomatis dari
+                        <strong class="font-semibold text-[#1d1d1f]">Algoritma Apriori</strong>.
+                    </p>
+                    <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
+                        <a href="#katalog" class="rounded-full bg-[#1d1d1f] px-7 py-3.5 text-sm font-semibold text-white transition hover:bg-[#0071e3]">
+                            Jelajahi Katalog &darr;
+                        </a>
+                        <a href="#bundling" class="rounded-full bg-[#0071e3] px-7 py-3.5 text-sm font-semibold text-white transition hover:bg-blue-700">
+                            Lihat Paket Bundling Hemat
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Paket Bundling Apriori -->
+            <section id="bundling" class="mx-auto max-w-7xl px-4 pt-14 sm:px-6 lg:px-8">
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-widest text-[#0071e3]">Market Basket Analysis &bull; Apriori</p>
+                    <h2 class="mt-1 text-2xl font-extrabold tracking-tight text-[#1d1d1f] sm:text-3xl">Paket Bundling Hemat Pilihan Pelanggan</h2>
+                    <p class="mt-1 text-sm text-[#86868b]">Pasangan produk dengan asosiasi kuat (Lift Ratio &gt; 1.0). Klik Ambil Paket untuk diskon otomatis di keranjang.</p>
+                </div>
+
+                <div class="mt-7 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    <template x-for="b in topBundles()" :key="b.key">
+                        <div class="flex flex-col justify-between rounded-3xl bg-white p-6 shadow-[0_4px_24px_rgba(0,0,0,0.04)] ring-1 ring-black/[0.05] transition hover:scale-[1.01]">
+                            <div>
+                                <div class="flex items-center justify-between">
+                                    <span class="rounded-full bg-[#0071e3]/10 px-3 py-1 text-xs font-bold text-[#0071e3]" x-text="'Hemat ' + b.rule.discount + '%'"></span>
+                                    <span class="text-[11px] font-medium text-[#86868b]" x-text="'Lift ' + b.rule.lift_ratio.toFixed(2) + 'x • Conf ' + b.rule.confidence.toFixed(0) + '%'"></span>
+                                </div>
+                                <h3 class="mt-4 text-base font-bold tracking-tight text-[#1d1d1f]" x-text="b.items.map(i => i.name).join(' + ')"></h3>
+                                <div class="mt-4 space-y-2">
+                                    <template x-for="it in b.items" :key="it.id">
+                                        <div class="flex items-center justify-between rounded-2xl bg-[#f5f5f7] px-3.5 py-2 text-xs">
+                                            <span class="truncate font-medium text-[#1d1d1f]" x-text="'1x ' + it.name"></span>
+                                            <span class="shrink-0 font-semibold text-[#86868b]" x-text="rp(it.selling_price)"></span>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                            <div class="mt-6 flex items-center justify-between border-t border-black/[0.06] pt-4">
+                                <div>
+                                    <p class="text-xs text-[#86868b] line-through" x-text="rp(b.normal)"></p>
+                                    <p class="text-lg font-extrabold text-[#1d1d1f]" x-text="rp(b.price)"></p>
+                                </div>
+                                <button @click="addBundleToCart(b.rule)" class="rounded-full bg-[#0071e3] px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-[#1d1d1f]">
+                                    + Ambil Paket
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </section>
+
+            <!-- Katalog 30 Produk -->
+            <section id="katalog" class="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+                <div class="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-widest text-[#86868b]">Katalog Lengkap</p>
+                        <h2 class="mt-1 text-2xl font-extrabold tracking-tight text-[#1d1d1f] sm:text-3xl">30 Produk Kebutuhan Harian</h2>
+                    </div>
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+                        <input x-model="search" type="search" placeholder="Cari nama produk atau SKU..." class="w-full rounded-full border-0 bg-white px-4 py-2.5 text-xs ring-1 ring-black/[0.08] focus:ring-2 focus:ring-[#0071e3] sm:w-72" />
+                        <button @click="onlyFast = !onlyFast" :class="onlyFast ? 'bg-[#1d1d1f] text-white' : 'bg-white text-[#1d1d1f] ring-1 ring-black/[0.08]'" class="rounded-full px-4 py-2.5 text-xs font-semibold transition">
+                            Terlaris (Fast-Moving)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Category Pills -->
+                <div class="mt-6 flex flex-wrap items-center gap-2">
+                    <button @click="activeCat = 'all'" :class="activeCat === 'all' ? 'bg-[#1d1d1f] text-white' : 'bg-white text-[#1d1d1f]'" class="rounded-full px-4 py-2 text-xs font-semibold ring-1 ring-black/[0.06] transition">
+                        Semua Kategori (<span x-text="data.products.length"></span>)
+                    </button>
+                    <template x-for="c in data.categories" :key="c.slug">
+                        <button @click="activeCat = c.slug" :class="activeCat === c.slug ? 'bg-[#1d1d1f] text-white' : 'bg-white text-[#1d1d1f]'" class="rounded-full px-4 py-2 text-xs font-semibold ring-1 ring-black/[0.06] transition">
+                            <span x-text="c.name"></span> (<span x-text="c.products_count"></span>)
+                        </button>
+                    </template>
+                </div>
+
+                <!-- Product Grid -->
+                <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    <template x-for="p in filteredCatalog()" :key="p.id">
+                        <article class="group flex flex-col justify-between rounded-3xl bg-white p-5 shadow-[0_4px_24px_rgba(0,0,0,0.04)] ring-1 ring-black/[0.04] transition-all duration-300 hover:scale-[1.02]">
+                            <div>
+                                <!-- Apple-Inspired SVG Placeholder Visual -->
+                                <div class="relative flex aspect-[4/3] w-full flex-col items-center justify-between overflow-hidden rounded-2xl bg-[#f5f5f7] p-4">
+                                    <div class="flex w-full items-center justify-between text-[10px] font-semibold uppercase tracking-wider text-[#86868b]">
+                                        <span x-text="p.category"></span>
+                                        <span class="font-mono" x-text="p.unit"></span>
+                                    </div>
+                                    <div class="my-auto flex h-16 w-16 items-center justify-center rounded-3xl bg-white/80 text-sm font-extrabold text-[#1d1d1f] shadow-2xs ring-1 ring-black/[0.06]" x-text="p.initials"></div>
+                                    <p class="w-full truncate text-center text-[11px] font-medium text-[#1d1d1f]/80" x-text="p.name"></p>
+
+                                    <div class="absolute left-3 top-9 flex gap-1.5">
+                                        <span x-show="p.movement_type === 'fast_moving'" class="rounded-full bg-[#1d1d1f]/85 px-2.5 py-0.5 text-[10px] font-semibold text-white">Terlaris</span>
+                                        <span x-show="p.current_stock <= p.min_stock_threshold" class="rounded-full bg-amber-500 px-2.5 py-0.5 text-[10px] font-semibold text-white" x-text="'Sisa ' + p.current_stock"></span>
+                                    </div>
+
+                                    <button @click="toggleWishlist(p.id)" class="absolute right-3 top-9 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/90 shadow-2xs">
+                                        <span :class="wishlist.includes(p.id) ? 'text-rose-500' : 'text-gray-400'">&#9829;</span>
+                                    </button>
+                                </div>
+
+                                <div class="mt-4">
+                                    <div class="flex justify-between text-xs text-[#86868b]">
+                                        <span x-text="p.category"></span>
+                                        <span x-text="'Stok ' + p.current_stock + ' ' + p.unit"></span>
+                                    </div>
+                                    <h3 class="mt-1 line-clamp-1 text-base font-semibold tracking-tight text-[#1d1d1f]" x-text="p.name"></h3>
+                                    <p class="mt-1 line-clamp-2 text-xs text-[#86868b]" x-text="p.description"></p>
+                                </div>
+                            </div>
+
+                            <div class="mt-5 flex items-center justify-between border-t border-black/[0.05] pt-4">
+                                <div>
+                                    <p class="text-[11px] text-[#86868b]" x-text="'Harga / ' + p.unit"></p>
+                                    <p class="text-lg font-bold text-[#1d1d1f]" x-text="rp(p.selling_price)"></p>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <button @click="quickProduct = p" class="rounded-full bg-[#f5f5f7] px-3 py-2 text-xs font-semibold text-[#1d1d1f] hover:bg-gray-200">Detail</button>
+                                    <button @click="addToCart(p, 1)" class="rounded-full bg-[#1d1d1f] px-4 py-2 text-xs font-semibold text-white hover:bg-[#0071e3]">+ Keranjang</button>
+                                </div>
+                            </div>
+                        </article>
+                    </template>
+                </div>
+            </section>
+        </div>
+
+        <!-- PAGE: WISHLIST -->
+        <div x-show="page === 'wishlist'" x-cloak class="mx-auto w-full max-w-7xl flex-1 px-4 py-12 sm:px-6 lg:px-8">
+            <h1 class="text-3xl font-extrabold tracking-tight text-[#1d1d1f]">Produk Favorit Saya</h1>
+            <div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                <template x-for="p in data.products.filter(x => wishlist.includes(x.id))" :key="p.id">
+                    <div class="rounded-3xl bg-white p-5 shadow-2xs ring-1 ring-black/[0.05]">
+                        <p class="text-xs text-[#86868b]" x-text="p.category"></p>
+                        <h3 class="mt-1 font-bold text-[#1d1d1f]" x-text="p.name"></h3>
+                        <p class="mt-2 text-lg font-extrabold text-[#1d1d1f]" x-text="rp(p.selling_price)"></p>
+                        <div class="mt-4 flex gap-2">
+                            <button @click="addToCart(p, 1)" class="flex-1 rounded-full bg-[#1d1d1f] py-2 text-xs font-semibold text-white">+ Keranjang</button>
+                            <button @click="toggleWishlist(p.id)" class="rounded-full bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-600">Hapus</button>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <!-- PAGE: CART & CHECKOUT -->
+        <div x-show="page === 'cart'" x-cloak class="mx-auto w-full max-w-6xl flex-1 px-4 py-12 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-widest text-[#0071e3]">Smart Bundle Detection</p>
+                    <h1 class="mt-1 text-3xl font-extrabold tracking-tight text-[#1d1d1f]">Keranjang Belanja &amp; Checkout</h1>
+                </div>
+                <button @click="page = 'catalog'" class="text-xs font-semibold text-[#0071e3] hover:underline">&larr; Lanjut Belanja</button>
+            </div>
+
+            <div x-show="cart.length === 0" class="mt-8 rounded-3xl bg-white p-12 text-center">
+                <p class="font-bold text-[#1d1d1f]">Keranjang belanja masih kosong.</p>
+                <button @click="page = 'catalog'" class="mt-4 rounded-full bg-[#1d1d1f] px-6 py-2.5 text-xs font-semibold text-white">Jelajahi Katalog</button>
+            </div>
+
+            <div x-show="cart.length > 0" class="mt-8 grid gap-8 lg:grid-cols-3">
+                <div class="space-y-4 lg:col-span-2">
+                    <template x-for="item in cart" :key="item.id">
+                        <div class="flex items-center justify-between rounded-3xl bg-white p-5 shadow-2xs ring-1 ring-black/[0.04]">
+                            <div>
+                                <p class="text-xs text-[#86868b]" x-text="item.category"></p>
+                                <h3 class="font-bold text-[#1d1d1f]" x-text="item.name"></h3>
+                                <p class="text-xs font-semibold" x-text="rp(item.selling_price) + ' / ' + item.unit"></p>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <input type="number" x-model.number="item.qty" min="1" :max="item.current_stock" class="w-16 rounded-full border-gray-300 py-1 text-center text-xs font-bold" />
+                                <p class="w-24 text-right text-sm font-bold" x-text="rp(item.selling_price * item.qty)"></p>
+                                <button @click="cart = cart.filter(c => c.id !== item.id)" class="text-rose-600">&#10005;</button>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- Form Alamat & Metode Pembayaran -->
+                    <div class="rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.04]">
+                        <h3 class="text-base font-bold text-[#1d1d1f]">Alamat Pengiriman &amp; Metode Pembayaran</h3>
+                        <textarea x-model="shippingAddress" rows="2" class="mt-3 w-full rounded-2xl border p-3 text-xs"></textarea>
+                        <div class="mt-4 grid grid-cols-3 gap-2.5 text-xs">
+                            <button type="button" @click="paymentMethod = 'qris'" :class="paymentMethod === 'qris' ? 'ring-2 ring-[#0071e3] bg-[#0071e3]/5' : 'ring-1 ring-black/10'" class="rounded-2xl p-3 text-left font-bold">QRIS Simulasi</button>
+                            <button type="button" @click="paymentMethod = 'transfer_bank'" :class="paymentMethod === 'transfer_bank' ? 'ring-2 ring-[#0071e3] bg-[#0071e3]/5' : 'ring-1 ring-black/10'" class="rounded-2xl p-3 text-left font-bold">Transfer Bank</button>
+                            <button type="button" @click="paymentMethod = 'cod'" :class="paymentMethod === 'cod' ? 'ring-2 ring-[#0071e3] bg-[#0071e3]/5' : 'ring-1 ring-black/10'" class="rounded-2xl p-3 text-left font-bold">COD</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="rounded-3xl bg-white p-6 shadow-lg ring-1 ring-black/[0.05]">
+                        <h2 class="text-lg font-extrabold text-[#1d1d1f]">Ringkasan Pembayaran</h2>
+                        <div class="mt-4 space-y-2.5 text-xs">
+                            <div class="flex justify-between text-[#86868b]">
+                                <span>Subtotal</span>
+                                <span class="font-semibold text-[#1d1d1f]" x-text="rp(cartSubtotal())"></span>
+                            </div>
+                            <template x-if="cartBundleCalc().discount > 0">
+                                <div class="rounded-2xl bg-emerald-50 p-3 text-emerald-800 ring-1 ring-emerald-200">
+                                    <div class="flex justify-between font-bold">
+                                        <span>Smart Bundle Apriori</span>
+                                        <span x-text="'-' + rp(cartBundleCalc().discount)"></span>
+                                    </div>
+                                    <template x-for="b in cartBundleCalc().bundles" :key="b.label">
+                                        <p class="mt-1 text-[11px]" x-text="'• ' + b.label + ' (-' + b.percent + '%)'"></p>
+                                    </template>
+                                </div>
+                            </template>
+                            <div class="flex justify-between border-t pt-3 text-sm font-extrabold">
+                                <span>Total Bayar</span>
+                                <span class="text-xl" x-text="rp(cartTotal())"></span>
+                            </div>
+                        </div>
+                        <button @click="submitCheckout()" class="mt-6 w-full rounded-full bg-[#0071e3] py-3.5 text-xs font-semibold text-white hover:bg-[#1d1d1f]">
+                            Buat Pesanan Sekarang &rarr;
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE: ORDERS -->
+        <div x-show="page === 'orders'" x-cloak class="mx-auto w-full max-w-5xl flex-1 px-4 py-12 sm:px-6 lg:px-8">
+            <h1 class="text-3xl font-extrabold tracking-tight text-[#1d1d1f]">Pelacakan Status Pesanan Saya</h1>
+            <div class="mt-6 space-y-5">
+                <template x-for="o in myOrders" :key="o.invoice_number">
+                    <div class="rounded-3xl bg-white p-6 shadow-2xs ring-1 ring-black/[0.05]">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <div>
+                                <span class="font-mono text-sm font-bold" x-text="o.invoice_number"></span>
+                                <span class="ml-2 rounded-full bg-[#0071e3]/10 px-3 py-0.5 text-xs font-bold text-[#0071e3]" x-text="o.status_label"></span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="text-base font-extrabold" x-text="rp(o.total_amount)"></span>
+                                <button @click="window.print()" class="rounded-full bg-[#1d1d1f] px-4 py-1.5 text-xs font-semibold text-white">Cetak Invoice PDF</button>
+                            </div>
+                        </div>
+                        <!-- Visual Stepper -->
+                        <div class="mt-4 grid grid-cols-4 gap-2 text-center text-[11px]">
+                            <template x-for="(st, idx) in ['Menunggu Pembayaran','Diproses','Dikirim','Selesai']" :key="st">
+                                <div :class="idx <= statusStep(o.order_status) ? 'bg-[#0071e3] text-white' : 'bg-[#f5f5f7] text-[#86868b]'" class="rounded-xl py-2 font-semibold" x-text="(idx+1) + '. ' + st"></div>
+                            </template>
+                        </div>
+                        <div x-show="o.order_status === 'menunggu_pembayaran'" class="mt-4 flex items-center justify-between rounded-2xl bg-amber-50 p-3.5 text-xs text-amber-900">
+                            <span>Menunggu konfirmasi pembayaran (<strong x-text="o.payment_label"></strong>)</span>
+                            <button @click="o.order_status = 'diproses'; o.status_label = 'Diproses'; notify('Pembayaran berhasil dikonfirmasi!')" class="rounded-full bg-[#0071e3] px-4 py-1.5 font-semibold text-white">
+                                Konfirmasi Pembayaran (Simulasi)
+                            </button>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <!-- Quick View Modal -->
+        <div x-show="quickProduct" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
+            <div @click.outside="quickProduct = null" class="w-full max-w-lg rounded-3xl bg-white p-6 shadow-2xl">
+                <template x-if="quickProduct">
+                    <div>
+                        <div class="flex justify-between">
+                            <div>
+                                <span class="rounded-full bg-[#f5f5f7] px-3 py-1 text-xs font-semibold text-[#86868b]" x-text="quickProduct.category"></span>
+                                <h3 class="mt-2 text-xl font-extrabold" x-text="quickProduct.name"></h3>
+                            </div>
+                            <button @click="quickProduct = null" class="rounded-full bg-[#f5f5f7] p-2">&#10005;</button>
+                        </div>
+                        <p class="mt-3 text-xs leading-relaxed text-[#86868b]" x-text="quickProduct.description"></p>
+                        <div class="mt-4 grid grid-cols-3 gap-2 rounded-2xl bg-[#f5f5f7] p-3.5 text-xs">
+                            <div><span class="text-[#86868b]">Harga</span><p class="font-bold" x-text="rp(quickProduct.selling_price)"></p></div>
+                            <div><span class="text-[#86868b]">Stok</span><p class="font-bold" x-text="quickProduct.current_stock + ' ' + quickProduct.unit"></p></div>
+                            <div><span class="text-[#86868b]">Prediksi OLS</span><p class="font-bold text-[#0071e3]" x-text="quickProduct.predicted_demand + ' / bln'"></p></div>
+                        </div>
+                        <button @click="addToCart(quickProduct, 1); quickProduct = null" class="mt-5 w-full rounded-full bg-[#1d1d1f] py-3 text-xs font-semibold text-white hover:bg-[#0071e3]">+ Tambah ke Keranjang</button>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+
+    <!-- ====================================================================== -->
+    <!-- MODE 2: BACK-OFFICE (ADMIN & PEMILIK)                                  -->
+    <!-- ====================================================================== -->
+    <div x-show="area === 'backoffice'" x-cloak class="flex min-h-screen">
+        <!-- Dark Apple Sidebar -->
+        <aside class="flex w-64 shrink-0 flex-col bg-[#1d1d1f] text-white">
+            <div class="flex h-16 items-center gap-3 border-b border-white/10 px-6">
+                <span class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-[#0071e3] font-bold">L</span>
+                <div>
+                    <p class="text-sm font-bold">LUMEN MART</p>
+                    <p class="text-[10px] uppercase tracking-widest text-white/50" x-text="role === 'admin' ? 'Admin Full Access' : 'Pemilik Read-Only'"></p>
+                </div>
+            </div>
+            <nav class="flex-1 space-y-1.5 p-4 text-xs">
+                <button @click="openTab('dashboard')" :class="tab === 'dashboard' ? 'bg-[#0071e3] text-white' : 'text-white/75 hover:bg-white/10'" class="flex w-full items-center rounded-2xl px-3.5 py-2.5 font-medium">Dashboard Eksekutif</button>
+                <button @click="openTab('regression')" :class="tab === 'regression' ? 'bg-[#0071e3] text-white' : 'text-white/75 hover:bg-white/10'" class="flex w-full items-center rounded-2xl px-3.5 py-2.5 font-medium">Prediksi Regresi Linear</button>
+                <button @click="openTab('apriori')" :class="tab === 'apriori' ? 'bg-[#0071e3] text-white' : 'text-white/75 hover:bg-white/10'" class="flex w-full items-center rounded-2xl px-3.5 py-2.5 font-medium">Bundling Apriori</button>
+                <button @click="openTab('reports')" :class="tab === 'reports' ? 'bg-[#0071e3] text-white' : 'text-white/75 hover:bg-white/10'" class="flex w-full items-center rounded-2xl px-3.5 py-2.5 font-medium">Laporan &amp; Ekspor CSV/PDF</button>
+
+                <template x-if="role === 'admin'">
+                    <div class="space-y-1.5 pt-4">
+                        <p class="px-3 text-[10px] font-bold uppercase tracking-widest text-white/40">Operasional Admin</p>
+                        <button @click="openTab('pos')" :class="tab === 'pos' ? 'bg-[#0071e3] text-white' : 'text-white/75 hover:bg-white/10'" class="flex w-full items-center rounded-2xl px-3.5 py-2.5 font-medium">POS Kasir Multi-Item</button>
+                        <button @click="openTab('incoming')" :class="tab === 'incoming' ? 'bg-[#0071e3] text-white' : 'text-white/75 hover:bg-white/10'" class="flex w-full items-center justify-between rounded-2xl px-3.5 py-2.5 font-medium">
+                            <span>Barang Masuk (Restock)</span>
+                            <span class="rounded-full bg-amber-500 px-1.5 py-0.5 text-[10px] font-bold text-[#1d1d1f]" x-text="criticalProducts().length"></span>
+                        </button>
+                        <button @click="openTab('products')" :class="tab === 'products' ? 'bg-[#0071e3] text-white' : 'text-white/75 hover:bg-white/10'" class="flex w-full items-center rounded-2xl px-3.5 py-2.5 font-medium">Katalog 30 Produk</button>
+                    </div>
+                </template>
+            </nav>
+            <div class="border-t border-white/10 p-4">
+                <button @click="switchRole('customer')" class="w-full rounded-2xl bg-white/10 py-2.5 text-xs font-semibold text-white hover:bg-white/20">&larr; Lihat Storefront Toko</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="flex flex-1 flex-col">
+            <!-- Header with Critical Stock Bell -->
+            <header class="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-black/[0.06] bg-white/85 px-6 backdrop-blur-xl">
+                <h1 class="text-base font-bold text-[#1d1d1f]">Back-Office LUMEN MART</h1>
+                <div class="flex items-center gap-3">
+                    <!-- Lonceng Stok Kritis -->
+                    <div x-data="{ bell: false }" class="relative">
+                        <button @click="bell = !bell" class="relative inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#f5f5f7]">
+                            <span>&#128276;</span>
+                            <span class="absolute -right-0.5 -top-0.5 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-rose-600 px-1 text-[10px] font-bold text-white" x-text="criticalProducts().length"></span>
+                        </button>
+                        <div x-show="bell" @click.outside="bell = false" x-cloak class="absolute right-0 mt-2 w-80 overflow-hidden rounded-3xl bg-white shadow-xl ring-1 ring-black/10">
+                            <div class="bg-[#1d1d1f] px-4 py-3 text-xs font-bold text-white">Peringatan Stok Kritis (<span x-text="criticalProducts().length"></span>)</div>
+                            <div class="max-h-64 divide-y overflow-y-auto">
+                                <template x-for="cp in criticalProducts()" :key="cp.id">
+                                    <div class="flex items-center justify-between px-4 py-2.5 text-xs">
+                                        <div>
+                                            <p class="font-bold" x-text="cp.name"></p>
+                                            <p class="text-[11px] text-rose-600" x-text="'Sisa ' + cp.current_stock + ' ' + cp.unit + ' (min ' + cp.min_stock_threshold + ')'"></p>
+                                        </div>
+                                        <button x-show="role === 'admin'" @click="bell=false; restockProductId = cp.id; openTab('incoming')" class="rounded-full bg-[#0071e3] px-3 py-1 text-[11px] font-semibold text-white">Restock</button>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="rounded-full bg-[#1d1d1f] px-3 py-1 text-xs font-semibold text-white" x-text="role === 'admin' ? 'Admin' : 'Pemilik (Read-Only)'"></span>
+                </div>
+            </header>
+
+            <main class="mx-auto w-full max-w-7xl flex-1 p-6">
+                <!-- TAB: DASHBOARD -->
+                <div x-show="tab === 'dashboard'" class="space-y-6">
+                    <div class="grid grid-cols-2 gap-4 lg:grid-cols-6">
+                        <div class="rounded-3xl bg-white p-5 shadow-2xs"><p class="text-[11px] font-semibold uppercase text-[#86868b]">Total Pendapatan</p><p class="mt-2 text-lg font-extrabold" x-text="rp(data.kpi.total_revenue)"></p></div>
+                        <div class="rounded-3xl bg-white p-5 shadow-2xs"><p class="text-[11px] font-semibold uppercase text-[#86868b]">Estimasi Laba Kotor</p><p class="mt-2 text-lg font-extrabold text-emerald-700" x-text="rp(data.kpi.gross_profit)"></p></div>
+                        <div class="rounded-3xl bg-white p-5 shadow-2xs"><p class="text-[11px] font-semibold uppercase text-[#86868b]">Total Transaksi</p><p class="mt-2 text-lg font-extrabold" x-text="data.kpi.total_transactions"></p><p class="text-[11px] text-[#86868b]" x-text="'POS ' + data.kpi.pos_count + ' • Online ' + data.kpi.ecommerce_count"></p></div>
+                        <div class="rounded-3xl bg-white p-5 shadow-2xs"><p class="text-[11px] font-semibold uppercase text-[#86868b]">Stok Kritis</p><p class="mt-2 text-lg font-extrabold text-rose-600" x-text="criticalProducts().length + ' Produk'"></p></div>
+                        <div class="rounded-3xl bg-white p-5 shadow-2xs"><p class="text-[11px] font-semibold uppercase text-[#86868b]">Rata-rata R² Fast</p><p class="mt-2 text-lg font-extrabold text-[#0071e3]">0.886</p></div>
+                        <div class="rounded-3xl bg-white p-5 shadow-2xs"><p class="text-[11px] font-semibold uppercase text-[#86868b]">Aturan Apriori</p><p class="mt-2 text-lg font-extrabold" x-text="data.rules.length + ' Aturan'"></p></div>
+                    </div>
+
+                    <div class="rounded-3xl bg-white p-6 shadow-2xs">
+                        <h3 class="text-base font-bold">Tren Pendapatan &amp; Transaksi 12 Bulan (POS Toko vs E-Commerce)</h3>
+                        <div class="mt-4 h-72"><canvas id="ghRevenueChart"></canvas></div>
+                    </div>
+                </div>
+
+                <!-- TAB: REGRESI LINEAR -->
+                <div x-show="tab === 'regression'" x-cloak class="space-y-6">
+                    <div class="flex flex-wrap items-center justify-between gap-4 rounded-3xl bg-white p-6 shadow-2xs">
+                        <div>
+                            <p class="text-xs font-bold uppercase text-[#0071e3]">Ordinary Least Squares (Y = a + bX) &bull; Split 80:20</p>
+                            <h2 class="text-xl font-extrabold" x-text="'Kurva Regresi Linear: ' + selectedRegProduct().name"></h2>
+                            <p class="text-xs text-[#86868b]" x-text="selectedRegProduct().equation + ' • R² = ' + selectedRegProduct().r_squared + ' • MAE = ' + selectedRegProduct().mae + ' • RMSE = ' + selectedRegProduct().rmse"></p>
+                        </div>
+                        <select x-model.number="selectedProductId" @change="renderRegressionChart()" class="rounded-full border bg-[#f5f5f7] px-4 py-2 text-xs font-semibold">
+                            <template x-for="p in data.products" :key="p.id">
+                                <option :value="p.id" x-text="p.name + ' (R²=' + p.r_squared + ')'"></option>
+                            </template>
+                        </select>
+                    </div>
+                    <div class="rounded-3xl bg-white p-6 shadow-2xs">
+                        <div class="h-72"><canvas id="ghRegressionChart"></canvas></div>
+                    </div>
+                    <div class="rounded-3xl bg-white p-6 shadow-2xs overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead>
+                                <tr class="border-b text-[11px] uppercase text-[#86868b]">
+                                    <th class="pb-2">Produk</th><th class="pb-2">Tipe</th><th class="pb-2">Persamaan OLS</th><th class="pb-2 text-right">R²</th><th class="pb-2 text-right">MAE</th><th class="pb-2 text-right">RMSE</th><th class="pb-2 text-right">Prediksi</th><th class="pb-2 text-right">Stok</th><th class="pb-2 text-right">Saran Restock</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y">
+                                <template x-for="p in data.products" :key="p.id">
+                                    <tr>
+                                        <td class="py-2.5 font-bold" x-text="p.name"></td>
+                                        <td class="py-2.5" x-text="p.movement_type"></td>
+                                        <td class="py-2.5 font-mono" x-text="p.equation"></td>
+                                        <td class="py-2.5 text-right font-bold text-emerald-700" x-text="p.r_squared"></td>
+                                        <td class="py-2.5 text-right" x-text="p.mae"></td>
+                                        <td class="py-2.5 text-right" x-text="p.rmse"></td>
+                                        <td class="py-2.5 text-right font-bold text-[#0071e3]" x-text="p.predicted_demand + ' ' + p.unit"></td>
+                                        <td class="py-2.5 text-right" x-text="p.current_stock"></td>
+                                        <td class="py-2.5 text-right font-bold text-amber-700" x-text="'+' + p.restock_recommendation + ' ' + p.unit"></td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- TAB: APRIORI -->
+                <div x-show="tab === 'apriori'" x-cloak class="space-y-6">
+                    <div class="rounded-3xl bg-white p-6 shadow-2xs overflow-x-auto">
+                        <h2 class="text-lg font-extrabold">Aturan Asosiasi Algoritma Apriori (Lift Ratio &gt; 1.0)</h2>
+                        <table class="mt-4 w-full text-left text-xs">
+                            <thead>
+                                <tr class="border-b text-[11px] uppercase text-[#86868b]">
+                                    <th class="pb-2">Jika Membeli (Antecedent)</th><th class="pb-2">Maka Membeli (Consequent)</th><th class="pb-2 text-right">Support</th><th class="pb-2 text-right">Confidence</th><th class="pb-2 text-right">Lift Ratio</th><th class="pb-2 text-center">Diskon</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y">
+                                <template x-for="r in data.rules" :key="r.id">
+                                    <tr>
+                                        <td class="py-2.5 font-bold" x-text="r.antecedent_names"></td>
+                                        <td class="py-2.5 font-semibold text-[#0071e3]" x-text="'→ ' + r.consequent_names"></td>
+                                        <td class="py-2.5 text-right" x-text="r.support + '%'"></td>
+                                        <td class="py-2.5 text-right font-bold" x-text="r.confidence + '%'"></td>
+                                        <td class="py-2.5 text-right font-bold text-[#0071e3]" x-text="r.lift_ratio"></td>
+                                        <td class="py-2.5 text-center font-bold text-emerald-700" x-text="r.discount + '%'"></td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- TAB: POS KASIR -->
+                <div x-show="tab === 'pos'" x-cloak class="grid gap-6 lg:grid-cols-3">
+                    <div class="rounded-3xl bg-white p-5 shadow-2xs lg:col-span-2">
+                        <h3 class="text-base font-bold">Pilih Produk POS Kasir</h3>
+                        <div class="mt-4 grid max-h-96 grid-cols-2 gap-3 overflow-y-auto sm:grid-cols-3">
+                            <template x-for="p in data.products" :key="p.id">
+                                <button @click="addToCart(p, 1)" class="rounded-2xl bg-[#f5f5f7] p-3 text-left text-xs hover:bg-[#1d1d1f] hover:text-white">
+                                    <p class="font-bold" x-text="p.name"></p>
+                                    <p class="mt-1 font-extrabold text-[#0071e3]" x-text="rp(p.selling_price)"></p>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
+                    <div class="rounded-3xl bg-white p-6 shadow-2xs">
+                        <h3 class="text-base font-bold">Struk Kasir</h3>
+                        <div class="mt-4 space-y-2 text-xs">
+                            <template x-for="c in cart" :key="c.id">
+                                <div class="flex justify-between">
+                                    <span x-text="c.qty + 'x ' + c.name"></span>
+                                    <span class="font-bold" x-text="rp(c.selling_price * c.qty)"></span>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="mt-4 border-t pt-3 text-sm font-extrabold flex justify-between">
+                            <span>Total POS</span>
+                            <span x-text="rp(cartTotal())"></span>
+                        </div>
+                        <button @click="submitPos()" class="mt-4 w-full rounded-full bg-[#0071e3] py-3 text-xs font-semibold text-white">Simpan Transaksi POS</button>
+                    </div>
+                </div>
+
+                <!-- TAB: INCOMING RESTOCK -->
+                <div x-show="tab === 'incoming'" x-cloak class="rounded-3xl bg-white p-6 shadow-2xs">
+                    <h3 class="text-base font-bold">Catat Transaksi Barang Masuk (Restock)</h3>
+                    <div class="mt-4 grid gap-4 sm:grid-cols-3 text-xs">
+                        <select x-model.number="restockProductId" class="rounded-2xl border p-2.5">
+                            <template x-for="p in data.products" :key="p.id">
+                                <option :value="p.id" x-text="p.name + ' (Stok: ' + p.current_stock + ')'"></option>
+                            </template>
+                        </select>
+                        <input type="number" x-model.number="restockQty" min="1" class="rounded-2xl border p-2.5" placeholder="Jumlah Masuk" />
+                        <button @click="submitRestock()" class="rounded-full bg-[#1d1d1f] py-2.5 font-semibold text-white hover:bg-[#0071e3]">+ Simpan Restock</button>
+                    </div>
+                </div>
+
+                <!-- TAB: PRODUCTS -->
+                <div x-show="tab === 'products'" x-cloak class="rounded-3xl bg-white p-6 shadow-2xs overflow-x-auto">
+                    <h3 class="text-base font-bold">Katalog 30 Produk &amp; Path Aset Lokal</h3>
+                    <table class="mt-4 w-full text-left text-xs">
+                        <thead><tr class="border-b text-[11px] uppercase text-[#86868b]"><th class="pb-2">SKU</th><th class="pb-2">Nama Produk</th><th class="pb-2">Path Gambar Lokal</th><th class="pb-2 text-right">Harga Jual</th><th class="pb-2 text-right">Stok</th></tr></thead>
+                        <tbody class="divide-y">
+                            <template x-for="p in data.products" :key="p.id">
+                                <tr>
+                                    <td class="py-2 font-mono" x-text="p.sku"></td>
+                                    <td class="py-2 font-bold" x-text="p.name"></td>
+                                    <td class="py-2 font-mono text-[11px] text-[#86868b]" x-text="p.image_path"></td>
+                                    <td class="py-2 text-right font-bold" x-text="rp(p.selling_price)"></td>
+                                    <td class="py-2 text-right font-bold" x-text="p.current_stock + ' ' + p.unit"></td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- TAB: REPORTS -->
+                <div x-show="tab === 'reports'" x-cloak class="rounded-3xl bg-white p-6 shadow-2xs">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-base font-bold">Laporan Penjualan &amp; Ekspor Data</h3>
+                        <div class="flex gap-2">
+                            <button @click="exportCsv()" class="rounded-full bg-[#1d1d1f] px-4 py-2 text-xs font-semibold text-white">&darr; Unduh CSV Stok &amp; Prediksi</button>
+                            <button @click="window.print()" class="rounded-full bg-[#0071e3] px-4 py-2 text-xs font-semibold text-white">&darr; Cetak / Simpan PDF</button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        const INITIAL_DATA = {"kpi":{"total_revenue":75802100,"gross_profit":12591600,"total_transactions":800,"pos_count":447,"ecommerce_count":353},"months":["Des 2025","Jan 2026","Feb 2026","Mar 2026","Apr 2026","Mei 2026","Jun 2026","Jul 2026","Agt 2026","Sep 2026","Okt 2026","Nov 2026"],"target_month":"Des 2026","pos_rev_series":[314000,1498500,2604700,3180100,2678000,3474600,3831600,4334300,4318700,4821300,6300500,6021600],"ecom_rev_series":[1775000,1645100,1706000,1392400,2523800,2240500,2438800,3113700,3981100,3454600,3741200,4412000],"tx_count_series":[18,27,36,44,53,62,71,80,89,98,107,115],"categories":[{"id":4,"name":"Bumbu Dapur","slug":"bumbu-dapur","description":"Kecap, saus, kaldu, dan rempah pelengkap masakan.","products_count":6},{"id":5,"name":"Kebersihan Rumah","slug":"kebersihan-rumah","description":"Sabun, deterjen, pewangi, dan pembersih rumah tangga.","products_count":6},{"id":3,"name":"Makanan Instan","slug":"makanan-instan","description":"Mie instan, roti, biskuit, sereal, dan makanan kaleng.","products_count":6},{"id":2,"name":"Minuman & Kopi","slug":"minuman-kopi","description":"Kopi, teh, susu, air mineral, dan minuman segar.","products_count":6},{"id":1,"name":"Sembako","slug":"sembako","description":"Kebutuhan pokok harian: beras, minyak, gula, telur, dan tepung.","products_count":6}],"products":[{"id":1,"sku":"LM-SMB-001","name":"Beras Pandan Wangi 5kg","slug":"beras-pandan-wangi-5kg","category_id":1,"category":"Sembako","category_slug":"sembako","description":"Beras Pandan Wangi 5kg pilihan LUMEN MART untuk kebutuhan harian keluarga. Kualitas terjaga, harga bersahabat, dan selalu tersedia di rak Sembako.","image_path":"public\/assets\/products\/sembako\/beras-pandan-wangi-5kg.jpg","unit":"karung","purchase_price":68000,"selling_price":76500,"current_stock":45,"min_stock_threshold":15,"movement_type":"fast_moving","initials":"BP","total_sold_qty":170,"total_sales":13005000,"monthly_actual":[3,6,8,12,9,14,14,16,23,17,25,23],"monthly_fitted":[4.13,5.92,7.72,9.51,11.3,13.1,14.89,16.68,18.48,20.27,22.07,23.86],"equation":"Y = 2.33 + 1.79X","r_squared":0.8521,"mae":1.9,"rmse":2.16,"predicted_demand":25.7,"restock_recommendation":0},{"id":2,"sku":"LM-SMB-002","name":"Minyak Goreng Sawit 2L","slug":"minyak-goreng-sawit-2l","category_id":1,"category":"Sembako","category_slug":"sembako","description":"Minyak Goreng Sawit 2L pilihan LUMEN MART untuk kebutuhan harian keluarga. Kualitas terjaga, harga bersahabat, dan selalu tersedia di rak Sembako.","image_path":"public\/assets\/products\/sembako\/minyak-goreng-2l.jpg","unit":"pouch","purchase_price":32000,"selling_price":36500,"current_stock":6,"min_stock_threshold":15,"movement_type":"fast_moving","initials":"MG","total_sold_qty":248,"total_sales":9052000,"monthly_actual":[5,9,13,13,23,17,24,24,23,30,33,34],"monthly_fitted":[7.05,9.51,11.96,14.42,16.87,19.33,21.78,24.24,26.69,29.15,31.6,34.05],"equation":"Y = 4.60 + 2.45X","r_squared":0.8768,"mae":0.73,"rmse":0.99,"predicted_demand":36.5,"restock_recommendation":33},{"id":3,"sku":"LM-SMB-003","name":"Gula Pasir Kristal Putih 1kg","slug":"gula-pasir-kristal-putih-1kg","category_id":1,"category":"Sembako","category_slug":"sembako","description":"Gula Pasir Kristal Putih 1kg pilihan LUMEN MART untuk kebutuhan harian keluarga. Kualitas terjaga, harga bersahabat, dan selalu tersedia di rak Sembako.","image_path":"public\/assets\/products\/sembako\/gula-pasir-1kg.jpg","unit":"pack","purchase_price":15500,"selling_price":18000,"current_stock":65,"min_stock_threshold":15,"movement_type":"fast_moving","initials":"GP","total_sold_qty":282,"total_sales":5076000,"monthly_actual":[7,12,15,17,16,22,23,23,31,37,38,41],"monthly_fitted":[7.56,10.39,13.22,16.05,18.88,21.72,24.55,27.38,30.21,33.04,35.87,38.7],"equation":"Y = 4.73 + 2.83X","r_squared":0.9255,"mae":2.22,"rmse":2.22,"predicted_demand":41.5,"restock_recommendation":0},{"id":4,"sku":"LM-SMB-004","name":"Telur Ayam Negeri Segar 1kg","slug":"telur-ayam-negeri-segar-1kg","category_id":1,"category":"Sembako","category_slug":"sembako","description":"Telur Ayam Negeri Segar 1kg pilihan LUMEN MART untuk kebutuhan harian keluarga. Kualitas terjaga, harga bersahabat, dan selalu tersedia di rak Sembako.","image_path":"public\/assets\/products\/sembako\/telur-ayam-negeri-1kg.jpg","unit":"kg","purchase_price":26000,"selling_price":29500,"current_stock":4,"min_stock_threshold":15,"movement_type":"fast_moving","initials":"TA","total_sold_qty":294,"total_sales":8673000,"monthly_actual":[6,13,15,15,19,18,24,36,29,28,43,48],"monthly_fitted":[8.27,10.95,13.62,16.29,18.96,21.64,24.31,26.98,29.65,32.33,35,37.67],"equation":"Y = 5.60 + 2.67X","r_squared":0.823,"mae":9.16,"rmse":9.24,"predicted_demand":40.4,"restock_recommendation":53},{"id":5,"sku":"LM-SMB-005","name":"Tepung Terigu Serbaguna 1kg","slug":"tepung-terigu-serbaguna-1kg","category_id":1,"category":"Sembako","category_slug":"sembako","description":"Tepung Terigu Serbaguna 1kg pilihan LUMEN MART untuk kebutuhan harian keluarga. Kualitas terjaga, harga bersahabat, dan selalu tersedia di rak Sembako.","image_path":"public\/assets\/products\/sembako\/tepung-terigu-1kg.jpg","unit":"pack","purchase_price":11000,"selling_price":13500,"current_stock":72,"min_stock_threshold":15,"movement_type":"fast_moving","initials":"TT","total_sold_qty":133,"total_sales":1795500,"monthly_actual":[4,5,6,6,12,9,10,15,18,12,16,20],"monthly_fitted":[3.78,5.1,6.41,7.73,9.04,10.36,11.67,12.99,14.3,15.62,16.93,18.25],"equation":"Y = 2.47 + 1.32X","r_squared":0.7506,"mae":1.34,"rmse":1.4,"predicted_demand":19.6,"restock_recommendation":0},{"id":6,"sku":"LM-SMB-006","name":"Garam Dapur Beryodium 500g","slug":"garam-dapur-beryodium-500g","category_id":1,"category":"Sembako","category_slug":"sembako","description":"Garam Dapur Beryodium 500g pilihan LUMEN MART untuk kebutuhan harian keluarga. Kualitas terjaga, harga bersahabat, dan selalu tersedia di rak Sembako.","image_path":"public\/assets\/products\/sembako\/garam-beryodium-500g.jpg","unit":"pack","purchase_price":3500,"selling_price":5000,"current_stock":2,"min_stock_threshold":8,"movement_type":"slow_moving","initials":"GD","total_sold_qty":24,"total_sales":120000,"monthly_actual":[2,3,2,1,1,1,4,2,1,3,2,2],"monthly_fitted":[1.89,1.92,1.94,1.96,1.99,2.01,2.04,2.06,2.08,2.11,2.13,2.16],"equation":"Y = 1.87 + 0.02X","r_squared":0.0048,"mae":0.15,"rmse":0.15,"predicted_demand":2.2,"restock_recommendation":2},{"id":7,"sku":"LM-MNK-001","name":"Kopi Bubuk Murni 200g","slug":"kopi-bubuk-murni-200g","category_id":2,"category":"Minuman & Kopi","category_slug":"minuman-kopi","description":"Kopi Bubuk Murni 200g pilihan LUMEN MART untuk kebutuhan harian keluarga. Kualitas terjaga, harga bersahabat, dan selalu tersedia di rak Minuman & Kopi.","image_path":"public\/assets\/products\/minuman-kopi\/kopi-bubuk-arabika-200g.jpg","unit":"pack","purchase_price":22000,"selling_price":27500,"current_stock":5,"min_stock_threshold":15,"movement_type":"fast_moving","initials":"KB","total_sold_qty":276,"total_sales":7590000,"monthly_actual":[6,7,18,16,16,19,20,26,31,35,42,40],"monthly_fitted":[6.2,9.13,12.07,15,17.93,20.87,23.8,26.73,29.67,32.6,35.53,38.47],"equation":"Y = 3.27 + 2.93X","r_squared":0.9096,"mae":4,"rmse":4.7,"predicted_demand":41.4,"restock_recommendation":45},{"id":8,"sku":"LM-MNK-002","name":"Teh Celup Melati Isi 25","slug":"teh-celup-melati-isi-25","category_id":2,"category":"Minuman & Kopi","category_slug":"minuman-kopi","description":"Teh Celup Melati Isi 25 pilihan LUMEN MART untuk kebutuhan harian keluarga. Kualitas terjaga, harga bersahabat, dan selalu tersedia di rak Minuman & Kopi.","image_path":"public\/assets\/products\/minuman-kopi\/teh-celup-isi-25.jpg","unit":"box","purchase_price":5500,"selling_price":7500,"current_stock":64,"min_stock_threshold":15,"movement_type":"fast_moving","initials":"TC","total_sold_qty":186,"total_sales":1395000,"monthly_actual":[3,7,9,12,11,17,14,16,22,22,27,26],"monthly_fitted":[4.49,6.45,8.41,10.36,12.32,14.28,16.24,18.19,20.15,22.11,24.07,26.02],"equation":"Y = 2.53 + 1.96X","r_squared":0.9188,"mae":1.48,"rmse":2.07,"predicted_demand":28,"restock_recommendation":0},{"id":9,"sku":"LM-MNK-003","name":"Susu Kental Manis Kaleng 370g","slug":"susu-kental-manis-kaleng-370g","category_id":2,"category":"Minuman & Kopi","category_slug":"minuman-kopi","description":"Susu Kental Manis Kaleng 370g pilihan LUMEN MART untuk kebutuhan harian keluarga. Kualitas terjaga, harga bersahabat, dan selalu tersedia di rak Minuman & Kopi.","image_path":"public\/assets\/products\/minuman-kopi\/susu-kental-manis-370g.jpg","unit":"kaleng","purchase_price":10500,"selling_price":12500,"current_stock":68,"min_stock_threshold":15,"movement_type":"fast_moving","initials":"SK","total_sold_qty":216,"total_sales":2700000,"monthly_actual":[5,5,10,12,11,20,18,21,26,24,31,33],"monthly_fitted":[4.29,6.72,9.14,11.56,13.99,16.41,18.84,21.26,23.68,26.11,28.53,30.96],"equation":"Y = 1.87 + 2.42X","r_squared":0.9295,"mae":2.25,"rmse":2.26,"predicted_demand":33.4,"restock_recommendation":0},{"id":10,"sku":"LM-MNK-004","name":"Air Mineral Kemasan 1500ml","slug":"air-mineral-kemasan-1500ml","category_id":2,"category":"Minuman & Kopi","category_slug":"minuman-kopi","description":"Air Mineral Kemasan 1500ml pilihan LUMEN MART untuk kebutuhan harian keluarga. Kualitas terjaga, harga bersahabat, dan selalu tersedia di rak Minuman & Kopi.","image_path":"public\/assets\/products\/minuman-kopi\/air-mineral-1500ml.jpg","unit":"botol","purchase_price":4000,"selling_price":6000,"current_stock":43,"min_stock_threshold":15,"movement_type":"fast_moving","initials":"AM","total_sold_qty":246,"total_sales":1476000,"monthly_actual":[7,8,12,16,15,24,19,30,22,29,33,31],"monthly_fitted":[7.18,9.63,12.08,14.53,16.98,19.42,21.87,24.32,26.77,29.22,31.67,34.12],"equation":"Y = 4.73 + 2.45X","r_squared":0.8417,"mae":2.22,"rmse":2.4,"predicted_demand":36.6,"restock_recommendation":0},{"id":11,"sku":"LM-MNK-005","name":"Sirup Cocopandan Botol 460ml","slug":"sirup-cocopandan-botol-460ml","category_id":2,"category":"Minuman & Kopi","category_slug":"minuman-kopi","description":"Sirup Cocopandan Botol 460ml pilihan LUMEN MART untuk kebutuhan harian keluarga. Kualitas terjaga, harga bersahabat, dan selalu tersedia di rak Minuman & Kopi.","image_path":"public\/assets\/products\/minuman-kopi\/sirup-cocopandan-460ml.jpg","unit":"botol","purchase_price":15000,"selling_price":19000,"current_stock":24,"min_stock_threshold":8,"movement_type":"slow_moving","initials":"SC","total_sold_qty":32,"total_sales":608000,"monthly_actual":[3,3,2,3,5,2,2,3,2,2,2,3],"monthly_fitted":[3.16,3.06,2.96,2.85,2.75,2.65,2.55,2.44,2.34,2.24,2.13,2.03],"equation":"Y = 3.27 − 0.10X","r_squared":0.1081,"mae":0.55,"rmse":0.69,"predicted_demand":1.9,"restock_recommendation":0},{"id":12,"sku":"LM-MNK-006","name":"Minuman Soda Kaleng 330ml","slug":"minuman-soda-kaleng-330ml","category_id":2,"category":"Minuman & Kopi","category_slug":"minuman-kopi","description":"Minuman Soda Kaleng 330ml pilihan LUMEN MART untuk kebutuhan harian keluarga. Kualitas terjaga, harga bersahabat, dan selalu tersedia di rak Minuman & Kopi.","image_path":"public\/assets\/products\/minuman-kopi\/minuman-soda-kaleng-330ml.jpg","unit":"kaleng","purchase_price":6000,"selling_price":8000,"current_stock":32,"min_stock_threshold":8,"movement_type":"slow_moving","initials":"MS","total_sold_qty":31,"total_sales":248000,"monthly_actual":[2,2,4,3,3,1,2,3,3,1,2,5],"monthly_fitted":[2.73,2.65,2.58,2.51,2.44,2.36,2.29,2.22,2.15,2.07,2,1.93],"equation":"Y = 2.80 − 0.07X","r_squared":0.0519,"mae":1.54,"rmse":2.17,"predicted_demand":1.9,"restock_recommendation":0},{"id":13,"sku":"LM-MKI-001","name":"Mie Instan Goreng 85g","slug":"mie-instan-goreng-85g","category_id":3,"category":"Makanan Instan","category_slug":"makanan-instan","description":"Mie Instan Goreng 85g pilihan LUMEN MART untuk kebutuhan harian keluarga. Kualitas terjaga, harga bersahabat, dan selalu tersedia di rak Makanan Instan.","image_path":"public\/assets\/products\/makanan-instan\/mie-instan-goreng-85g.jpg","unit":"bungkus","purchase_price":2700,"selling_price":3500,"current_stock":60,"min_stock_threshold":15,"movement_type":"fast_moving","initials":"MI","total_sold_qty":300,"total_sales":1050000,"monthly_actual":[6,9,16,20,18,22,26,31,34,29,40,49],"monthly_fitted":[8.04,10.94,13.84,16.75,19.65,22.55,25.45,28.36,31.26,34.16,37.07,39.97],"equation":"Y = 5.13 + 2.90X","r_squared":0.9114,"mae":5.98,"rmse":6.71,"predicted_demand":42.9,"restock_recommendation":0},{"id":14,"sku":"LM-MKI-002","name":"Mie Instan Kuah Soto 75g","slug":"mie-instan-kuah-soto-75g","category_id":3,"category":"Makanan Instan","category_slug":"makanan-instan","description":"Mie Instan Kuah Soto 75g pilihan LUMEN MART untuk kebutuhan harian keluarga. Kualitas terjaga, harga bersahabat, dan selalu tersedia di rak Makanan Instan.","image_path":"public\/assets\/products\/makanan-instan\/mie-instan-kuah-75g.jpg","unit":"bungkus","purchase_price":2500,"selling_price":3300,"current_stock":50,"min_stock_threshold":15,"movement_type":"fast_moving","initials":"MI","total_sold_qty":222,"total_sales":732600,"monthly_actual":[5,7,9,10,16,17,18,20,26,23,34,37],"monthly_fitted":[4.87,7.15,9.42,11.69,13.96,16.24,18.51,20.78,23.05,25.33,27.6,29.87],"equation":"Y = 2.60 + 2.27X","r_squared":0.9493,"mae":6.76,"rmse":6.77,"predicted_demand":32.2,"restock_recommendation":0},{"id":15,"sku":"LM-MKI-003","name":"Roti Tawar Kupas Lembut","slug":"roti-tawar-kupas-lembut","category_id":3,"category":"Makanan Instan","category_slug":"makanan-instan","description":"Roti Tawar Kupas Lembut pilihan LUMEN MART untuk kebutuhan harian keluarga. Kualitas terjaga, harga bersahabat, dan selalu tersedia di rak Makanan Instan.","image_path":"public\/assets\/products\/makanan-instan\/roti-tawar-kupas.jpg","unit":"bungkus","purchase_price":13000,"selling_price":16000,"current_stock":71,"min_stock_threshold":15,"movement_type":"fast_moving","initials":"RT","total_sold_qty":178,"total_sales":2848000,"monthly_actual":[4,7,9,11,10,11,18,19,18,22,18,31],"monthly_fitted":[4.42,6.3,8.19,10.07,11.96,13.84,15.73,17.61,19.5,21.38,23.27,25.15],"equation":"Y = 2.53 + 1.88X","r_squared":0.9249,"mae":5.56,"rmse":5.57,"predicted_demand":27,"restock_recommendation":0},{"id":16,"sku":"LM-MKI-004","name":"Biskuit Mentega Kaleng 300g","slug":"biskuit-mentega-kaleng-300g","category_id":3,"category":"Makanan Instan","category_slug":"makanan-instan","description":"Biskuit Mentega Kaleng 300g pilihan LUMEN MART untuk kebutuhan harian keluarga. Kualitas terjaga, harga bersahabat, dan selalu tersedia di rak Makanan Instan.","image_path":"public\/assets\/products\/makanan-instan\/biskuit-kaleng-300g.jpg","unit":"kaleng","purchase_price":38000,"selling_price":47000,"current_stock":24,"min_stock_threshold":8,"movement_type":"slow_moving","initials":"BM","total_sold_qty":30,"total_sales":1410000,"monthly_actual":[3,3,2,3,4,3,1,3,1,2,4,1],"monthly_fitted":[3.18,3.03,2.88,2.73,2.58,2.42,2.27,2.12,1.97,1.82,1.67,1.52],"equation":"Y = 3.33 − 0.15X","r_squared":0.2228,"mae":1.42,"rmse":1.69,"predicted_demand":1.4,"restock_recommendation":0},{"id":17,"sku":"LM-MKI-005","name":"Sereal Oat Instan 400g","slug":"sereal-oat-instan-400g","category_id":3,"category":"Makanan Instan","category_slug":"makanan-instan","description":"Sereal Oat Instan 400g pilihan LUMEN MART untuk kebutuhan harian keluarga. Kualitas terjaga, harga bersahabat, dan selalu tersedia di rak Makanan Instan.","image_path":"public\/assets\/products\/makanan-instan\/sereal-oat-instan-400g.jpg","unit":"box","purchase_price":32000,"selling_price":39500,"current_stock":21,"min_stock_threshold":8,"movement_type":"slow_moving","initials":"SO","total_sold_qty":25,"total_sales":987500,"monthly_actual":[2,2,2,1,3,1,3,3,2,4,1,1],"monthly_fitted":[1.56,1.73,1.89,2.05,2.22,2.38,2.55,2.71,2.87,3.04,3.2,3.36],"equation":"Y = 1.40 + 0.16X","r_squared":0.2727,"mae":2.28,"rmse":2.28,"predicted_demand":3.5,"restock_recommendation":0},{"id":18,"sku":"LM-MKI-006","name":"Ikan Sarden Saus Tomat 155g","slug":"ikan-sarden-saus-tomat-155g","category_id":3,"category":"Makanan Instan","category_slug":"makanan-instan","description":"Ikan Sarden Saus Tomat 155g pilihan LUMEN MART untuk kebutuhan harian keluarga. Kualitas terjaga, harga bersahabat, dan selalu tersedia di rak Makanan Instan.","image_path":"public\/assets\/products\/makanan-instan\/sarden-kaleng-155g.jpg","unit":"kaleng","purchase_price":9000,"selling_price":11500,"current_stock":39,"min_stock_threshold":8,"movement_type":"slow_moving","initials":"IS","total_sold_qty":37,"total_sales":425500,"monthly_actual":[1,1,5,4,2,2,2,6,5,3,3,3],"monthly_fitted":[1.87,2.15,2.42,2.69,2.96,3.24,3.51,3.78,4.05,4.33,4.6,4.87],"equation":"Y = 1.60 + 0.27X","r_squared":0.2123,"mae":1.74,"rmse":1.74,"predicted_demand":5.2,"restock_recommendation":0},{"id":19,"sku":"LM-BMB-001","name":"Kecap Manis Kedelai Hitam 520ml","slug":"kecap-manis-kedelai-hitam-520ml","category_id":4,"category":"Bumbu Dapur","category_slug":"bumbu-dapur","description":"Kecap Manis Kedelai Hitam 520ml pilihan LUMEN MART untuk kebutuhan harian keluarga. Kualitas terjaga, harga bersahabat, dan selalu tersedia di rak Bumbu Dapur.","image_path":"public\/assets\/products\/bumbu-dapur\/kecap-manis-520ml.jpg","unit":"botol","purchase_price":19000,"selling_price":23000,"current_stock":63,"min_stock_threshold":15,"movement_type":"fast_moving","initials":"KM","total_sold_qty":180,"total_sales":4140000,"monthly_actual":[2,4,8,10,13,13,15,21,20,19,29,26],"monthly_fitted":[3.09,5.18,7.27,9.36,11.45,13.55,15.64,17.73,19.82,21.91,24,26.09],"equation":"Y = 1.00 + 2.09X","r_squared":0.9332,"mae":2.55,"rmse":3.54,"predicted_demand":28.2,"restock_recommendation":0},{"id":20,"sku":"LM-BMB-002","name":"Saus Sambal Pedas 335ml","slug":"saus-sambal-pedas-335ml","category_id":4,"category":"Bumbu Dapur","category_slug":"bumbu-dapur","description":"Saus Sambal Pedas 335ml pilihan LUMEN MART untuk kebutuhan harian keluarga. Kualitas terjaga, harga bersahabat, dan selalu tersedia di rak Bumbu Dapur.","image_path":"public\/assets\/products\/bumbu-dapur\/saus-sambal-335ml.jpg","unit":"botol","purchase_price":9500,"selling_price":12000,"current_stock":56,"min_stock_threshold":15,"movement_type":"fast_moving","initials":"SS","total_sold_qty":183,"total_sales":2196000,"monthly_actual":[2,9,7,11,13,15,17,18,22,19,22,28],"monthly_fitted":[4.6,6.53,8.47,10.4,12.33,14.27,16.2,18.13,20.07,22,23.93,25.87],"equation":"Y = 2.67 + 1.93X","r_squared":0.9121,"mae":2.03,"rmse":2.04,"predicted_demand":27.8,"restock_recommendation":0},{"id":21,"sku":"LM-BMB-003","name":"Tepung Bumbu Krispi 210g","slug":"tepung-bumbu-krispi-210g","category_id":4,"category":"Bumbu Dapur","category_slug":"bumbu-dapur","description":"Tepung Bumbu Krispi 210g pilihan LUMEN MART untuk kebutuhan harian keluarga. Kualitas terjaga, harga bersahabat, dan selalu tersedia di rak Bumbu Dapur.","image_path":"public\/assets\/products\/bumbu-dapur\/tepung-bumbu-serbaguna-210g.jpg","unit":"pack","purchase_price":5500,"selling_price":7000,"current_stock":17,"min_stock_threshold":8,"movement_type":"slow_moving","initials":"TB","total_sold_qty":125,"total_sales":875000,"monthly_actual":[4,5,12,8,10,11,11,12,12,18,13,9],"monthly_fitted":[5.25,6.38,7.5,8.62,9.74,10.86,11.98,13.1,14.22,15.35,16.47,17.59],"equation":"Y = 4.13 + 1.12X","r_squared":0.7299,"mae":6.03,"rmse":6.55,"predicted_demand":18.7,"restock_recommendation":13},{"id":22,"sku":"LM-BMB-004","name":"Saus Tiram Botol 270ml","slug":"saus-tiram-botol-270ml","category_id":4,"category":"Bumbu Dapur","category_slug":"bumbu-dapur","description":"Saus Tiram Botol 270ml pilihan LUMEN MART untuk kebutuhan harian keluarga. Kualitas terjaga, harga bersahabat, dan selalu tersedia di rak Bumbu Dapur.","image_path":"public\/assets\/products\/bumbu-dapur\/saus-tiram-270ml.jpg","unit":"botol","purchase_price":12000,"selling_price":15500,"current_stock":3,"min_stock_threshold":8,"movement_type":"slow_moving","initials":"ST","total_sold_qty":31,"total_sales":480500,"monthly_actual":[1,3,4,4,3,5,2,1,4,1,1,2],"monthly_fitted":[3.13,3.05,2.98,2.91,2.84,2.76,2.69,2.62,2.55,2.47,2.4,2.33],"equation":"Y = 3.20 − 0.07X","r_squared":0.0223,"mae":0.86,"rmse":1.02,"predicted_demand":2.3,"restock_recommendation":2},{"id":23,"sku":"LM-BMB-005","name":"Kaldu Jamur Non-MSG 100g","slug":"kaldu-jamur-non-msg-100g","category_id":4,"category":"Bumbu Dapur","category_slug":"bumbu-dapur","description":"Kaldu Jamur Non-MSG 100g pilihan LUMEN MART untuk kebutuhan harian keluarga. Kualitas terjaga, harga bersahabat, dan selalu tersedia di rak Bumbu Dapur.","image_path":"public\/assets\/products\/bumbu-dapur\/kaldu-jamur-100g.jpg","unit":"pack","purchase_price":9000,"selling_price":12000,"current_stock":34,"min_stock_threshold":8,"movement_type":"slow_moving","initials":"KJ","total_sold_qty":34,"total_sales":408000,"monthly_actual":[3,1,3,3,1,4,3,3,2,4,4,3],"monthly_fitted":[2.18,2.3,2.41,2.53,2.64,2.76,2.87,2.99,3.1,3.22,3.33,3.45],"equation":"Y = 2.07 + 0.12X","r_squared":0.1083,"mae":0.56,"rmse":0.57,"predicted_demand":3.6,"restock_recommendation":0},{"id":24,"sku":"LM-BMB-006","name":"Lada Putih Bubuk Murni 50g","slug":"lada-putih-bubuk-murni-50g","category_id":4,"category":"Bumbu Dapur","category_slug":"bumbu-dapur","description":"Lada Putih Bubuk Murni 50g pilihan LUMEN MART untuk kebutuhan harian keluarga. Kualitas terjaga, harga bersahabat, dan selalu tersedia di rak Bumbu Dapur.","image_path":"public\/assets\/products\/bumbu-dapur\/lada-putih-bubuk-50g.jpg","unit":"pack","purchase_price":6000,"selling_price":8500,"current_stock":39,"min_stock_threshold":8,"movement_type":"slow_moving","initials":"LP","total_sold_qty":25,"total_sales":212500,"monthly_actual":[3,1,1,4,2,2,2,1,3,1,2,3],"monthly_fitted":[2.27,2.21,2.15,2.09,2.03,1.97,1.91,1.85,1.79,1.73,1.67,1.61],"equation":"Y = 2.33 − 0.06X","r_squared":0.0303,"mae":0.86,"rmse":1.01,"predicted_demand":1.6,"restock_recommendation":0},{"id":25,"sku":"LM-KBR-001","name":"Sabun Mandi Cair 450ml","slug":"sabun-mandi-cair-450ml","category_id":5,"category":"Kebersihan Rumah","category_slug":"kebersihan-rumah","description":"Sabun Mandi Cair 450ml pilihan LUMEN MART untuk kebutuhan harian keluarga. Kualitas terjaga, harga bersahabat, dan selalu tersedia di rak Kebersihan Rumah.","image_path":"public\/assets\/products\/kebersihan-rumah\/sabun-mandi-cair-450ml.jpg","unit":"botol","purchase_price":21000,"selling_price":26500,"current_stock":68,"min_stock_threshold":15,"movement_type":"fast_moving","initials":"SM","total_sold_qty":143,"total_sales":3789500,"monthly_actual":[4,5,10,6,9,9,11,12,18,20,20,19],"monthly_fitted":[3.31,4.88,6.46,8.04,9.61,11.19,12.76,14.34,15.92,17.49,19.07,20.64],"equation":"Y = 1.73 + 1.58X","r_squared":0.8314,"mae":1.29,"rmse":1.34,"predicted_demand":22.2,"restock_recommendation":0},{"id":26,"sku":"LM-KBR-002","name":"Deterjen Cair Konsentrat 750ml","slug":"deterjen-cair-konsentrat-750ml","category_id":5,"category":"Kebersihan Rumah","category_slug":"kebersihan-rumah","description":"Deterjen Cair Konsentrat 750ml pilihan LUMEN MART untuk kebutuhan harian keluarga. Kualitas terjaga, harga bersahabat, dan selalu tersedia di rak Kebersihan Rumah.","image_path":"public\/assets\/products\/kebersihan-rumah\/deterjen-cair-750ml.jpg","unit":"pouch","purchase_price":18000,"selling_price":23000,"current_stock":30,"min_stock_threshold":8,"movement_type":"slow_moving","initials":"DC","total_sold_qty":68,"total_sales":1564000,"monthly_actual":[5,6,8,4,4,6,4,5,7,6,5,8],"monthly_fitted":[5.42,5.44,5.45,5.47,5.49,5.51,5.53,5.55,5.56,5.58,5.6,5.62],"equation":"Y = 5.40 + 0.02X","r_squared":0.0017,"mae":1.49,"rmse":1.74,"predicted_demand":5.6,"restock_recommendation":0},{"id":27,"sku":"LM-KBR-003","name":"Sabun Cuci Piring Jeruk Nipis 650ml","slug":"sabun-cuci-piring-jeruk-nipis-650ml","category_id":5,"category":"Kebersihan Rumah","category_slug":"kebersihan-rumah","description":"Sabun Cuci Piring Jeruk Nipis 650ml pilihan LUMEN MART untuk kebutuhan harian keluarga. Kualitas terjaga, harga bersahabat, dan selalu tersedia di rak Kebersihan Rumah.","image_path":"public\/assets\/products\/kebersihan-rumah\/sabun-cuci-piring-650ml.jpg","unit":"pouch","purchase_price":12500,"selling_price":16000,"current_stock":32,"min_stock_threshold":8,"movement_type":"slow_moving","initials":"SC","total_sold_qty":31,"total_sales":496000,"monthly_actual":[4,2,1,2,2,4,4,2,2,1,4,3],"monthly_fitted":[2.78,2.7,2.61,2.53,2.44,2.36,2.27,2.19,2.1,2.02,1.93,1.85],"equation":"Y = 2.87 − 0.08X","r_squared":0.0479,"mae":1.61,"rmse":1.67,"predicted_demand":1.8,"restock_recommendation":0},{"id":28,"sku":"LM-KBR-004","name":"Pasta Gigi Herbal 190g","slug":"pasta-gigi-herbal-190g","category_id":5,"category":"Kebersihan Rumah","category_slug":"kebersihan-rumah","description":"Pasta Gigi Herbal 190g pilihan LUMEN MART untuk kebutuhan harian keluarga. Kualitas terjaga, harga bersahabat, dan selalu tersedia di rak Kebersihan Rumah.","image_path":"public\/assets\/products\/kebersihan-rumah\/pasta-gigi-190g.jpg","unit":"tube","purchase_price":13000,"selling_price":16500,"current_stock":4,"min_stock_threshold":8,"movement_type":"slow_moving","initials":"PG","total_sold_qty":31,"total_sales":511500,"monthly_actual":[2,4,1,1,4,4,4,1,3,3,1,3],"monthly_fitted":[2.4,2.47,2.53,2.6,2.67,2.73,2.8,2.87,2.93,3,3.07,3.13],"equation":"Y = 2.33 + 0.07X","r_squared":0.0228,"mae":1.1,"rmse":1.46,"predicted_demand":3.2,"restock_recommendation":3},{"id":29,"sku":"LM-KBR-005","name":"Pewangi & Pelembut Pakaian 800ml","slug":"pewangi-pelembut-pakaian-800ml","category_id":5,"category":"Kebersihan Rumah","category_slug":"kebersihan-rumah","description":"Pewangi & Pelembut Pakaian 800ml pilihan LUMEN MART untuk kebutuhan harian keluarga. Kualitas terjaga, harga bersahabat, dan selalu tersedia di rak Kebersihan Rumah.","image_path":"public\/assets\/products\/kebersihan-rumah\/pewangi-pakaian-800ml.jpg","unit":"pouch","purchase_price":14000,"selling_price":18000,"current_stock":39,"min_stock_threshold":8,"movement_type":"slow_moving","initials":"PP","total_sold_qty":77,"total_sales":1386000,"monthly_actual":[5,5,9,5,7,5,5,7,8,6,5,10],"monthly_fitted":[5.71,5.82,5.93,6.04,6.15,6.25,6.36,6.47,6.58,6.69,6.8,6.91],"equation":"Y = 5.60 + 0.11X","r_squared":0.0501,"mae":2.45,"rmse":2.53,"predicted_demand":7,"restock_recommendation":0},{"id":30,"sku":"LM-KBR-006","name":"Pembersih Lantai Karbol 780ml","slug":"pembersih-lantai-karbol-780ml","category_id":5,"category":"Kebersihan Rumah","category_slug":"kebersihan-rumah","description":"Pembersih Lantai Karbol 780ml pilihan LUMEN MART untuk kebutuhan harian keluarga. Kualitas terjaga, harga bersahabat, dan selalu tersedia di rak Kebersihan Rumah.","image_path":"public\/assets\/products\/kebersihan-rumah\/pembersih-lantai-780ml.jpg","unit":"pouch","purchase_price":11000,"selling_price":14500,"current_stock":32,"min_stock_threshold":8,"movement_type":"slow_moving","initials":"PL","total_sold_qty":38,"total_sales":551000,"monthly_actual":[2,6,2,3,2,5,4,3,3,3,2,3],"monthly_fitted":[3.33,3.32,3.32,3.31,3.3,3.3,3.29,3.28,3.28,3.27,3.27,3.26],"equation":"Y = 3.33 − 0.01X","r_squared":0.0002,"mae":0.76,"rmse":0.91,"predicted_demand":3.3,"restock_recommendation":0}],"rules":[{"id":1,"antecedent_ids":[26],"consequent_ids":[29],"product_ids":[26,29],"antecedent_names":"Deterjen Cair Konsentrat 750ml","consequent_names":"Pewangi & Pelembut Pakaian 800ml","support":4.13,"confidence":57.89,"lift_ratio":7.986,"discount":10,"suggestion":"Paket Hemat: Deterjen Cair Konsentrat 750ml + Pewangi & Pelembut Pakaian 800ml — diskon 10% bila dibeli bersamaan"},{"id":2,"antecedent_ids":[29],"consequent_ids":[26],"product_ids":[26,29],"antecedent_names":"Pewangi & Pelembut Pakaian 800ml","consequent_names":"Deterjen Cair Konsentrat 750ml","support":4.13,"confidence":56.9,"lift_ratio":7.986,"discount":10,"suggestion":"Paket Hemat: Pewangi & Pelembut Pakaian 800ml + Deterjen Cair Konsentrat 750ml — diskon 10% bila dibeli bersamaan"},{"id":3,"antecedent_ids":[3,9],"consequent_ids":[7],"product_ids":[3,7,9],"antecedent_names":"Gula Pasir Kristal Putih 1kg, Susu Kental Manis Kaleng 370g","consequent_names":"Kopi Bubuk Murni 200g","support":6.75,"confidence":90,"lift_ratio":4.586,"discount":10,"suggestion":"Paket Hemat: Gula Pasir Kristal Putih 1kg, Susu Kental Manis Kaleng 370g + Kopi Bubuk Murni 200g — diskon 10% bila dibeli bersamaan"},{"id":4,"antecedent_ids":[21],"consequent_ids":[2],"product_ids":[2,21],"antecedent_names":"Tepung Bumbu Krispi 210g","consequent_names":"Minyak Goreng Sawit 2L","support":10.13,"confidence":82.65,"lift_ratio":4.529,"discount":10,"suggestion":"Paket Hemat: Tepung Bumbu Krispi 210g + Minyak Goreng Sawit 2L — diskon 10% bila dibeli bersamaan"},{"id":5,"antecedent_ids":[2],"consequent_ids":[21],"product_ids":[2,21],"antecedent_names":"Minyak Goreng Sawit 2L","consequent_names":"Tepung Bumbu Krispi 210g","support":10.13,"confidence":55.48,"lift_ratio":4.529,"discount":10,"suggestion":"Paket Hemat: Minyak Goreng Sawit 2L + Tepung Bumbu Krispi 210g — diskon 10% bila dibeli bersamaan"},{"id":6,"antecedent_ids":[7,9],"consequent_ids":[3],"product_ids":[3,7,9],"antecedent_names":"Kopi Bubuk Murni 200g, Susu Kental Manis Kaleng 370g","consequent_names":"Gula Pasir Kristal Putih 1kg","support":6.75,"confidence":94.74,"lift_ratio":4.097,"discount":10,"suggestion":"Paket Hemat: Kopi Bubuk Murni 200g, Susu Kental Manis Kaleng 370g + Gula Pasir Kristal Putih 1kg — diskon 10% bila dibeli bersamaan"},{"id":8,"antecedent_ids":[3,7],"consequent_ids":[9],"product_ids":[3,7,9],"antecedent_names":"Gula Pasir Kristal Putih 1kg, Kopi Bubuk Murni 200g","consequent_names":"Susu Kental Manis Kaleng 370g","support":6.75,"confidence":52.43,"lift_ratio":3.329,"discount":10,"suggestion":"Paket Hemat: Gula Pasir Kristal Putih 1kg, Kopi Bubuk Murni 200g + Susu Kental Manis Kaleng 370g — diskon 10% bila dibeli bersamaan"},{"id":7,"antecedent_ids":[9],"consequent_ids":[3,7],"product_ids":[3,7,9],"antecedent_names":"Susu Kental Manis Kaleng 370g","consequent_names":"Gula Pasir Kristal Putih 1kg, Kopi Bubuk Murni 200g","support":6.75,"confidence":42.86,"lift_ratio":3.329,"discount":10,"suggestion":"Paket Hemat: Susu Kental Manis Kaleng 370g + Gula Pasir Kristal Putih 1kg, Kopi Bubuk Murni 200g — diskon 10% bila dibeli bersamaan"},{"id":9,"antecedent_ids":[3,13],"consequent_ids":[4],"product_ids":[3,4,13],"antecedent_names":"Gula Pasir Kristal Putih 1kg, Mie Instan Goreng 85g","consequent_names":"Telur Ayam Negeri Segar 1kg","support":3.38,"confidence":75,"lift_ratio":3.175,"discount":10,"suggestion":"Paket Hemat: Gula Pasir Kristal Putih 1kg, Mie Instan Goreng 85g + Telur Ayam Negeri Segar 1kg — diskon 10% bila dibeli bersamaan"},{"id":11,"antecedent_ids":[13],"consequent_ids":[4],"product_ids":[4,13],"antecedent_names":"Mie Instan Goreng 85g","consequent_names":"Telur Ayam Negeri Segar 1kg","support":14.88,"confidence":72.12,"lift_ratio":3.053,"discount":10,"suggestion":"Paket Hemat: Mie Instan Goreng 85g + Telur Ayam Negeri Segar 1kg — diskon 10% bila dibeli bersamaan"},{"id":10,"antecedent_ids":[4],"consequent_ids":[13],"product_ids":[4,13],"antecedent_names":"Telur Ayam Negeri Segar 1kg","consequent_names":"Mie Instan Goreng 85g","support":14.88,"confidence":62.96,"lift_ratio":3.053,"discount":10,"suggestion":"Paket Hemat: Telur Ayam Negeri Segar 1kg + Mie Instan Goreng 85g — diskon 10% bila dibeli bersamaan"},{"id":12,"antecedent_ids":[4,7],"consequent_ids":[3],"product_ids":[3,4,7],"antecedent_names":"Telur Ayam Negeri Segar 1kg, Kopi Bubuk Murni 200g","consequent_names":"Gula Pasir Kristal Putih 1kg","support":3.25,"confidence":70.27,"lift_ratio":3.039,"discount":10,"suggestion":"Paket Hemat: Telur Ayam Negeri Segar 1kg, Kopi Bubuk Murni 200g + Gula Pasir Kristal Putih 1kg — diskon 10% bila dibeli bersamaan"},{"id":13,"antecedent_ids":[7],"consequent_ids":[3],"product_ids":[3,7],"antecedent_names":"Kopi Bubuk Murni 200g","consequent_names":"Gula Pasir Kristal Putih 1kg","support":12.88,"confidence":65.61,"lift_ratio":2.837,"discount":7,"suggestion":"Paket Hemat: Kopi Bubuk Murni 200g + Gula Pasir Kristal Putih 1kg — diskon 7% bila dibeli bersamaan"},{"id":14,"antecedent_ids":[3],"consequent_ids":[7],"product_ids":[3,7],"antecedent_names":"Gula Pasir Kristal Putih 1kg","consequent_names":"Kopi Bubuk Murni 200g","support":12.88,"confidence":55.68,"lift_ratio":2.837,"discount":7,"suggestion":"Paket Hemat: Gula Pasir Kristal Putih 1kg + Kopi Bubuk Murni 200g — diskon 7% bila dibeli bersamaan"},{"id":15,"antecedent_ids":[3,4],"consequent_ids":[7],"product_ids":[3,4,7],"antecedent_names":"Gula Pasir Kristal Putih 1kg, Telur Ayam Negeri Segar 1kg","consequent_names":"Kopi Bubuk Murni 200g","support":3.25,"confidence":54.17,"lift_ratio":2.76,"discount":7,"suggestion":"Paket Hemat: Gula Pasir Kristal Putih 1kg, Telur Ayam Negeri Segar 1kg + Kopi Bubuk Murni 200g — diskon 7% bila dibeli bersamaan"},{"id":16,"antecedent_ids":[3,4],"consequent_ids":[13],"product_ids":[3,4,13],"antecedent_names":"Gula Pasir Kristal Putih 1kg, Telur Ayam Negeri Segar 1kg","consequent_names":"Mie Instan Goreng 85g","support":3.38,"confidence":56.25,"lift_ratio":2.727,"discount":7,"suggestion":"Paket Hemat: Gula Pasir Kristal Putih 1kg, Telur Ayam Negeri Segar 1kg + Mie Instan Goreng 85g — diskon 7% bila dibeli bersamaan"},{"id":17,"antecedent_ids":[9],"consequent_ids":[7],"product_ids":[7,9],"antecedent_names":"Susu Kental Manis Kaleng 370g","consequent_names":"Kopi Bubuk Murni 200g","support":7.13,"confidence":45.24,"lift_ratio":2.305,"discount":7,"suggestion":"Paket Hemat: Susu Kental Manis Kaleng 370g + Kopi Bubuk Murni 200g — diskon 7% bila dibeli bersamaan"},{"id":18,"antecedent_ids":[9],"consequent_ids":[3],"product_ids":[3,9],"antecedent_names":"Susu Kental Manis Kaleng 370g","consequent_names":"Gula Pasir Kristal Putih 1kg","support":7.5,"confidence":47.62,"lift_ratio":2.059,"discount":7,"suggestion":"Paket Hemat: Susu Kental Manis Kaleng 370g + Gula Pasir Kristal Putih 1kg — diskon 7% bila dibeli bersamaan"}],"recent_sales":[{"invoice_number":"POS-20261117-0800","date":"2026-11-17","channel":"pos_toko","channel_label":"POS Toko","user_name":"Admin Lumen","payment_method":"tunai","payment_label":"Tunai","order_status":"selesai","status_label":"Selesai","discount_amount":0,"total_amount":20500,"shipping_address":null,"items_count":2,"items":[{"name":"Tepung Terigu Serbaguna 1kg","qty":1,"price":13500,"subtotal":13500},{"name":"Tepung Bumbu Krispi 210g","qty":1,"price":7000,"subtotal":7000}]},{"invoice_number":"POS-20261117-0799","date":"2026-11-17","channel":"pos_toko","channel_label":"POS Toko","user_name":"Admin Lumen","payment_method":"qris","payment_label":"QRIS","order_status":"selesai","status_label":"Selesai","discount_amount":0,"total_amount":100500,"shipping_address":null,"items_count":3,"items":[{"name":"Minyak Goreng Sawit 2L","qty":2,"price":36500,"subtotal":73000},{"name":"Kopi Bubuk Murni 200g","qty":1,"price":27500,"subtotal":27500}]},{"invoice_number":"POS-20261117-0798","date":"2026-11-17","channel":"pos_toko","channel_label":"POS Toko","user_name":"Admin Lumen","payment_method":"tunai","payment_label":"Tunai","order_status":"selesai","status_label":"Selesai","discount_amount":0,"total_amount":76500,"shipping_address":null,"items_count":1,"items":[{"name":"Beras Pandan Wangi 5kg","qty":1,"price":76500,"subtotal":76500}]},{"invoice_number":"INV-20261117-0797","date":"2026-11-17","channel":"ecommerce","channel_label":"E-Commerce","user_name":"Agus Setiawan","payment_method":"transfer_bank","payment_label":"Transfer Bank","order_status":"diproses","status_label":"Diproses","discount_amount":0,"total_amount":367000,"shipping_address":"Jl. Bougenville No. 33, Kel. Panjang Jiwo, Kec. Tenggilis, Surabaya 60299","items_count":13,"items":[{"name":"Beras Pandan Wangi 5kg","qty":1,"price":76500,"subtotal":76500},{"name":"Minyak Goreng Sawit 2L","qty":3,"price":36500,"subtotal":109500},{"name":"Telur Ayam Negeri Segar 1kg","qty":1,"price":29500,"subtotal":29500},{"name":"Kopi Bubuk Murni 200g","qty":2,"price":27500,"subtotal":55000},{"name":"Teh Celup Melati Isi 25","qty":1,"price":7500,"subtotal":7500},{"name":"Deterjen Cair Konsentrat 750ml","qty":2,"price":23000,"subtotal":46000},{"name":"Gula Pasir Kristal Putih 1kg","qty":1,"price":18000,"subtotal":18000},{"name":"Tepung Bumbu Krispi 210g","qty":1,"price":7000,"subtotal":7000},{"name":"Pewangi & Pelembut Pakaian 800ml","qty":1,"price":18000,"subtotal":18000}]},{"invoice_number":"POS-20261116-0796","date":"2026-11-16","channel":"pos_toko","channel_label":"POS Toko","user_name":"Admin Lumen","payment_method":"tunai","payment_label":"Tunai","order_status":"selesai","status_label":"Selesai","discount_amount":0,"total_amount":235500,"shipping_address":null,"items_count":8,"items":[{"name":"Beras Pandan Wangi 5kg","qty":2,"price":76500,"subtotal":153000},{"name":"Tepung Terigu Serbaguna 1kg","qty":2,"price":13500,"subtotal":27000},{"name":"Teh Celup Melati Isi 25","qty":1,"price":7500,"subtotal":7500},{"name":"Roti Tawar Kupas Lembut","qty":3,"price":16000,"subtotal":48000}]},{"invoice_number":"INV-20261116-0795","date":"2026-11-16","channel":"ecommerce","channel_label":"E-Commerce","user_name":"Nur Halimah","payment_method":"transfer_bank","payment_label":"Transfer Bank","order_status":"menunggu_pembayaran","status_label":"Menunggu Pembayaran","discount_amount":0,"total_amount":27500,"shipping_address":"Jl. Bougenville No. 33, Kel. Panjang Jiwo, Kec. Tenggilis, Surabaya 60299","items_count":1,"items":[{"name":"Kopi Bubuk Murni 200g","qty":1,"price":27500,"subtotal":27500}]},{"invoice_number":"INV-20261116-0794","date":"2026-11-16","channel":"ecommerce","channel_label":"E-Commerce","user_name":"Intan Permata","payment_method":"qris","payment_label":"QRIS","order_status":"dikirim","status_label":"Dikirim","discount_amount":0,"total_amount":77100,"shipping_address":"Jl. Anggrek II No. 27, Kel. Pondok Kelapa, Kec. Duren Sawit, Jakarta Timur 13450","items_count":6,"items":[{"name":"Kopi Bubuk Murni 200g","qty":1,"price":27500,"subtotal":27500},{"name":"Mie Instan Kuah Soto 75g","qty":2,"price":3300,"subtotal":6600},{"name":"Gula Pasir Kristal Putih 1kg","qty":1,"price":18000,"subtotal":18000},{"name":"Susu Kental Manis Kaleng 370g","qty":2,"price":12500,"subtotal":25000}]},{"invoice_number":"POS-20261116-0793","date":"2026-11-16","channel":"pos_toko","channel_label":"POS Toko","user_name":"Admin Lumen","payment_method":"tunai","payment_label":"Tunai","order_status":"selesai","status_label":"Selesai","discount_amount":0,"total_amount":50500,"shipping_address":null,"items_count":3,"items":[{"name":"Saus Sambal Pedas 335ml","qty":2,"price":12000,"subtotal":24000},{"name":"Sabun Mandi Cair 450ml","qty":1,"price":26500,"subtotal":26500}]},{"invoice_number":"INV-20261116-0792","date":"2026-11-16","channel":"ecommerce","channel_label":"E-Commerce","user_name":"Fajar Nugroho","payment_method":"cod","payment_label":"COD (Bayar di Tempat)","order_status":"diproses","status_label":"Diproses","discount_amount":0,"total_amount":131000,"shipping_address":"Perum Griya Asri Blok C-14, Kel. Jatimulya, Kec. Tambun Selatan, Bekasi 17510","items_count":8,"items":[{"name":"Kopi Bubuk Murni 200g","qty":1,"price":27500,"subtotal":27500},{"name":"Mie Instan Goreng 85g","qty":3,"price":3500,"subtotal":10500},{"name":"Roti Tawar Kupas Lembut","qty":1,"price":16000,"subtotal":16000},{"name":"Gula Pasir Kristal Putih 1kg","qty":1,"price":18000,"subtotal":18000},{"name":"Telur Ayam Negeri Segar 1kg","qty":2,"price":29500,"subtotal":59000}]},{"invoice_number":"INV-20261116-0791","date":"2026-11-16","channel":"ecommerce","channel_label":"E-Commerce","user_name":"Fajar Nugroho","payment_method":"cod","payment_label":"COD (Bayar di Tempat)","order_status":"dikirim","status_label":"Dikirim","discount_amount":0,"total_amount":134000,"shipping_address":"Jl. Anggrek II No. 27, Kel. Pondok Kelapa, Kec. Duren Sawit, Jakarta Timur 13450","items_count":8,"items":[{"name":"Tepung Terigu Serbaguna 1kg","qty":2,"price":13500,"subtotal":27000},{"name":"Air Mineral Kemasan 1500ml","qty":1,"price":6000,"subtotal":6000},{"name":"Roti Tawar Kupas Lembut","qty":2,"price":16000,"subtotal":32000},{"name":"Sabun Mandi Cair 450ml","qty":2,"price":26500,"subtotal":53000},{"name":"Sabun Cuci Piring Jeruk Nipis 650ml","qty":1,"price":16000,"subtotal":16000}]},{"invoice_number":"POS-20261116-0790","date":"2026-11-16","channel":"pos_toko","channel_label":"POS Toko","user_name":"Admin Lumen","payment_method":"qris","payment_label":"QRIS","order_status":"selesai","status_label":"Selesai","discount_amount":0,"total_amount":138000,"shipping_address":null,"items_count":7,"items":[{"name":"Kopi Bubuk Murni 200g","qty":2,"price":27500,"subtotal":55000},{"name":"Kecap Manis Kedelai Hitam 520ml","qty":1,"price":23000,"subtotal":23000},{"name":"Kaldu Jamur Non-MSG 100g","qty":2,"price":12000,"subtotal":24000},{"name":"Gula Pasir Kristal Putih 1kg","qty":2,"price":18000,"subtotal":36000}]},{"invoice_number":"POS-20261115-0789","date":"2026-11-15","channel":"pos_toko","channel_label":"POS Toko","user_name":"Admin Lumen","payment_method":"qris","payment_label":"QRIS","order_status":"selesai","status_label":"Selesai","discount_amount":0,"total_amount":59000,"shipping_address":null,"items_count":3,"items":[{"name":"Gula Pasir Kristal Putih 1kg","qty":2,"price":18000,"subtotal":36000},{"name":"Kecap Manis Kedelai Hitam 520ml","qty":1,"price":23000,"subtotal":23000}]},{"invoice_number":"POS-20261115-0788","date":"2026-11-15","channel":"pos_toko","channel_label":"POS Toko","user_name":"Admin Lumen","payment_method":"qris","payment_label":"QRIS","order_status":"selesai","status_label":"Selesai","discount_amount":0,"total_amount":148500,"shipping_address":null,"items_count":6,"items":[{"name":"Minyak Goreng Sawit 2L","qty":3,"price":36500,"subtotal":109500},{"name":"Roti Tawar Kupas Lembut","qty":2,"price":16000,"subtotal":32000},{"name":"Tepung Bumbu Krispi 210g","qty":1,"price":7000,"subtotal":7000}]},{"invoice_number":"POS-20261115-0787","date":"2026-11-15","channel":"pos_toko","channel_label":"POS Toko","user_name":"Admin Lumen","payment_method":"tunai","payment_label":"Tunai","order_status":"selesai","status_label":"Selesai","discount_amount":0,"total_amount":36500,"shipping_address":null,"items_count":1,"items":[{"name":"Minyak Goreng Sawit 2L","qty":1,"price":36500,"subtotal":36500}]},{"invoice_number":"INV-20261115-0786","date":"2026-11-15","channel":"ecommerce","channel_label":"E-Commerce","user_name":"Budi Santoso","payment_method":"transfer_bank","payment_label":"Transfer Bank","order_status":"menunggu_pembayaran","status_label":"Menunggu Pembayaran","discount_amount":0,"total_amount":23000,"shipping_address":"Jl. Bougenville No. 33, Kel. Panjang Jiwo, Kec. Tenggilis, Surabaya 60299","items_count":1,"items":[{"name":"Kecap Manis Kedelai Hitam 520ml","qty":1,"price":23000,"subtotal":23000}]},{"invoice_number":"INV-20261114-0785","date":"2026-11-14","channel":"ecommerce","channel_label":"E-Commerce","user_name":"Agus Setiawan","payment_method":"transfer_bank","payment_label":"Transfer Bank","order_status":"selesai","status_label":"Selesai","discount_amount":0,"total_amount":118000,"shipping_address":"Jl. Bougenville No. 33, Kel. Panjang Jiwo, Kec. Tenggilis, Surabaya 60299","items_count":5,"items":[{"name":"Telur Ayam Negeri Segar 1kg","qty":2,"price":29500,"subtotal":59000},{"name":"Tepung Terigu Serbaguna 1kg","qty":1,"price":13500,"subtotal":13500},{"name":"Kopi Bubuk Murni 200g","qty":1,"price":27500,"subtotal":27500},{"name":"Gula Pasir Kristal Putih 1kg","qty":1,"price":18000,"subtotal":18000}]},{"invoice_number":"INV-20261114-0784","date":"2026-11-14","channel":"ecommerce","channel_label":"E-Commerce","user_name":"Rina Pelanggan","payment_method":"transfer_bank","payment_label":"Transfer Bank","order_status":"menunggu_pembayaran","status_label":"Menunggu Pembayaran","discount_amount":0,"total_amount":8000,"shipping_address":"Jl. Bougenville No. 33, Kel. Panjang Jiwo, Kec. Tenggilis, Surabaya 60299","items_count":1,"items":[{"name":"Minuman Soda Kaleng 330ml","qty":1,"price":8000,"subtotal":8000}]},{"invoice_number":"INV-20261114-0783","date":"2026-11-14","channel":"ecommerce","channel_label":"E-Commerce","user_name":"Agus Setiawan","payment_method":"cod","payment_label":"COD (Bayar di Tempat)","order_status":"diproses","status_label":"Diproses","discount_amount":0,"total_amount":112000,"shipping_address":"Jl. Cempaka Putih No. 3, Kel. Gondokusuman, Yogyakarta 55224","items_count":7,"items":[{"name":"Telur Ayam Negeri Segar 1kg","qty":2,"price":29500,"subtotal":59000},{"name":"Saus Sambal Pedas 335ml","qty":3,"price":12000,"subtotal":36000},{"name":"Lada Putih Bubuk Murni 50g","qty":2,"price":8500,"subtotal":17000}]},{"invoice_number":"POS-20261114-0782","date":"2026-11-14","channel":"pos_toko","channel_label":"POS Toko","user_name":"Admin Lumen","payment_method":"tunai","payment_label":"Tunai","order_status":"selesai","status_label":"Selesai","discount_amount":0,"total_amount":322000,"shipping_address":null,"items_count":10,"items":[{"name":"Beras Pandan Wangi 5kg","qty":2,"price":76500,"subtotal":153000},{"name":"Minyak Goreng Sawit 2L","qty":1,"price":36500,"subtotal":36500},{"name":"Kopi Bubuk Murni 200g","qty":3,"price":27500,"subtotal":82500},{"name":"Gula Pasir Kristal Putih 1kg","qty":1,"price":18000,"subtotal":18000},{"name":"Tepung Bumbu Krispi 210g","qty":1,"price":7000,"subtotal":7000},{"name":"Susu Kental Manis Kaleng 370g","qty":2,"price":12500,"subtotal":25000}]},{"invoice_number":"INV-20261114-0781","date":"2026-11-14","channel":"ecommerce","channel_label":"E-Commerce","user_name":"Dewi Lestari","payment_method":"cod","payment_label":"COD (Bayar di Tempat)","order_status":"dikirim","status_label":"Dikirim","discount_amount":0,"total_amount":241500,"shipping_address":"Jl. Bougenville No. 33, Kel. Panjang Jiwo, Kec. Tenggilis, Surabaya 60299","items_count":7,"items":[{"name":"Beras Pandan Wangi 5kg","qty":2,"price":76500,"subtotal":153000},{"name":"Kopi Bubuk Murni 200g","qty":1,"price":27500,"subtotal":27500},{"name":"Gula Pasir Kristal Putih 1kg","qty":2,"price":18000,"subtotal":36000},{"name":"Susu Kental Manis Kaleng 370g","qty":2,"price":12500,"subtotal":25000}]},{"invoice_number":"INV-20261113-0780","date":"2026-11-13","channel":"ecommerce","channel_label":"E-Commerce","user_name":"Fajar Nugroho","payment_method":"transfer_bank","payment_label":"Transfer Bank","order_status":"selesai","status_label":"Selesai","discount_amount":0,"total_amount":21300,"shipping_address":"Jl. Flamboyan No. 8, Kel. Sumbersari, Kec. Lowokwaru, Malang 65145","items_count":4,"items":[{"name":"Air Mineral Kemasan 1500ml","qty":3,"price":6000,"subtotal":18000},{"name":"Mie Instan Kuah Soto 75g","qty":1,"price":3300,"subtotal":3300}]},{"invoice_number":"INV-20261113-0779","date":"2026-11-13","channel":"ecommerce","channel_label":"E-Commerce","user_name":"Intan Permata","payment_method":"transfer_bank","payment_label":"Transfer Bank","order_status":"menunggu_pembayaran","status_label":"Menunggu Pembayaran","discount_amount":0,"total_amount":84500,"shipping_address":"Jl. Melati No. 12, Kel. Sukamaju, Kec. Cibeunying, Bandung 40121","items_count":5,"items":[{"name":"Minyak Goreng Sawit 2L","qty":1,"price":36500,"subtotal":36500},{"name":"Roti Tawar Kupas Lembut","qty":2,"price":16000,"subtotal":32000},{"name":"Minuman Soda Kaleng 330ml","qty":2,"price":8000,"subtotal":16000}]},{"invoice_number":"POS-20261113-0778","date":"2026-11-13","channel":"pos_toko","channel_label":"POS Toko","user_name":"Admin Lumen","payment_method":"tunai","payment_label":"Tunai","order_status":"selesai","status_label":"Selesai","discount_amount":0,"total_amount":13500,"shipping_address":null,"items_count":1,"items":[{"name":"Tepung Terigu Serbaguna 1kg","qty":1,"price":13500,"subtotal":13500}]},{"invoice_number":"POS-20261113-0777","date":"2026-11-13","channel":"pos_toko","channel_label":"POS Toko","user_name":"Admin Lumen","payment_method":"qris","payment_label":"QRIS","order_status":"selesai","status_label":"Selesai","discount_amount":0,"total_amount":49500,"shipping_address":null,"items_count":5,"items":[{"name":"Tepung Terigu Serbaguna 1kg","qty":2,"price":13500,"subtotal":27000},{"name":"Teh Celup Melati Isi 25","qty":3,"price":7500,"subtotal":22500}]},{"invoice_number":"POS-20261113-0776","date":"2026-11-13","channel":"pos_toko","channel_label":"POS Toko","user_name":"Admin Lumen","payment_method":"tunai","payment_label":"Tunai","order_status":"selesai","status_label":"Selesai","discount_amount":0,"total_amount":6000,"shipping_address":null,"items_count":1,"items":[{"name":"Air Mineral Kemasan 1500ml","qty":1,"price":6000,"subtotal":6000}]}],"recent_incoming":[{"date":"01\/11\/2026","product_name":"Pembersih Lantai Karbol 780ml","unit":"pouch","quantity":35,"unit_cost":11000,"total_cost":385000,"supplier_name":"PT Higienis Rumah Tangga","notes":"Restock rutin bulan November 2026"},{"date":"01\/11\/2026","product_name":"Pewangi & Pelembut Pakaian 800ml","unit":"pouch","quantity":49,"unit_cost":14000,"total_cost":686000,"supplier_name":"PT Higienis Rumah Tangga","notes":"Restock rutin bulan November 2026"},{"date":"01\/11\/2026","product_name":"Pasta Gigi Herbal 190g","unit":"tube","quantity":7,"unit_cost":13000,"total_cost":91000,"supplier_name":"PT Higienis Rumah Tangga","notes":"Restock rutin bulan November 2026"},{"date":"01\/11\/2026","product_name":"Sabun Cuci Piring Jeruk Nipis 650ml","unit":"pouch","quantity":35,"unit_cost":12500,"total_cost":437500,"supplier_name":"PT Higienis Rumah Tangga","notes":"Restock rutin bulan November 2026"},{"date":"01\/11\/2026","product_name":"Deterjen Cair Konsentrat 750ml","unit":"pouch","quantity":38,"unit_cost":18000,"total_cost":684000,"supplier_name":"PT Higienis Rumah Tangga","notes":"Restock rutin bulan November 2026"},{"date":"01\/11\/2026","product_name":"Sabun Mandi Cair 450ml","unit":"botol","quantity":87,"unit_cost":21000,"total_cost":1827000,"supplier_name":"PT Higienis Rumah Tangga","notes":"Restock rutin bulan November 2026"},{"date":"01\/11\/2026","product_name":"Lada Putih Bubuk Murni 50g","unit":"pack","quantity":42,"unit_cost":6000,"total_cost":252000,"supplier_name":"CV Rasa Dapur Indonesia","notes":"Restock rutin bulan November 2026"},{"date":"01\/11\/2026","product_name":"Kaldu Jamur Non-MSG 100g","unit":"pack","quantity":37,"unit_cost":9000,"total_cost":333000,"supplier_name":"CV Rasa Dapur Indonesia","notes":"Restock rutin bulan November 2026"},{"date":"01\/11\/2026","product_name":"Saus Tiram Botol 270ml","unit":"botol","quantity":5,"unit_cost":12000,"total_cost":60000,"supplier_name":"CV Rasa Dapur Indonesia","notes":"Restock rutin bulan November 2026"},{"date":"01\/11\/2026","product_name":"Tepung Bumbu Krispi 210g","unit":"pack","quantity":26,"unit_cost":5500,"total_cost":143000,"supplier_name":"CV Rasa Dapur Indonesia","notes":"Restock rutin bulan November 2026"},{"date":"01\/11\/2026","product_name":"Saus Sambal Pedas 335ml","unit":"botol","quantity":84,"unit_cost":9500,"total_cost":798000,"supplier_name":"CV Rasa Dapur Indonesia","notes":"Restock rutin bulan November 2026"},{"date":"01\/11\/2026","product_name":"Kecap Manis Kedelai Hitam 520ml","unit":"botol","quantity":89,"unit_cost":19000,"total_cost":1691000,"supplier_name":"CV Rasa Dapur Indonesia","notes":"Restock rutin bulan November 2026"},{"date":"01\/11\/2026","product_name":"Ikan Sarden Saus Tomat 155g","unit":"kaleng","quantity":42,"unit_cost":9000,"total_cost":378000,"supplier_name":"PT Distribusi Pangan Instan","notes":"Restock rutin bulan November 2026"},{"date":"01\/11\/2026","product_name":"Sereal Oat Instan 400g","unit":"box","quantity":22,"unit_cost":32000,"total_cost":704000,"supplier_name":"PT Distribusi Pangan Instan","notes":"Restock rutin bulan November 2026"},{"date":"01\/11\/2026","product_name":"Biskuit Mentega Kaleng 300g","unit":"kaleng","quantity":25,"unit_cost":38000,"total_cost":950000,"supplier_name":"PT Distribusi Pangan Instan","notes":"Restock rutin bulan November 2026"}]};
+
+        function lumenMartApp() {
+            return {
+                data: INITIAL_DATA,
+                role: 'customer',
+                area: 'storefront',
+                page: 'catalog',
+                tab: 'dashboard',
+                search: '',
+                activeCat: 'all',
+                onlyFast: false,
+                quickProduct: null,
+                wishlist: [7, 16, 17],
+                cart: [],
+                myOrders: INITIAL_DATA.recent_sales.filter(s => s.channel === 'ecommerce').slice(0, 6),
+                shippingAddress: 'Jl. Melati No. 12, Kel. Sukamaju, Kec. Cibeunying, Kota Bandung 40121',
+                paymentMethod: 'qris',
+                selectedProductId: 7,
+                restockProductId: 2,
+                restockQty: 25,
+                toast: null,
+                revChart: null,
+                regChart: null,
+
+                init() {
+                    this.$nextTick(() => {
+                        this.renderRevenueChart();
+                        this.renderRegressionChart();
+                    });
+                },
+                notify(msg) {
+                    this.toast = msg;
+                    setTimeout(() => { this.toast = null; }, 3200);
+                },
+                switchRole(r) {
+                    this.role = r;
+                    if (r === 'customer') {
+                        this.area = 'storefront';
+                    } else {
+                        this.area = 'backoffice';
+                        this.tab = 'dashboard';
+                        this.$nextTick(() => this.renderRevenueChart());
+                    }
+                },
+                openTab(t) {
+                    this.tab = t;
+                    this.$nextTick(() => {
+                        if (t === 'dashboard') this.renderRevenueChart();
+                        if (t === 'regression') this.renderRegressionChart();
+                    });
+                },
+                rp(v) {
+                    return 'Rp ' + new Intl.NumberFormat('id-ID').format(Math.round(v || 0));
+                },
+                filteredCatalog() {
+                    return this.data.products.filter(p => {
+                        if (this.activeCat !== 'all' && p.category_slug !== this.activeCat) return false;
+                        if (this.onlyFast && p.movement_type !== 'fast_moving') return false;
+                        if (!this.search) return true;
+                        const q = this.search.toLowerCase();
+                        return p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q);
+                    });
+                },
+                topBundles() {
+                    const seen = {};
+                    const out = [];
+                    const byId = Object.fromEntries(this.data.products.map(p => [p.id, p]));
+                    for (const r of this.data.rules) {
+                        const key = r.product_ids.join('-');
+                        if (seen[key]) continue;
+                        seen[key] = true;
+                        const items = r.product_ids.map(id => byId[id]).filter(Boolean);
+                        const normal = items.reduce((s, i) => s + i.selling_price, 0);
+                        out.push({ key, rule: r, items, normal, price: normal * (100 - r.discount) / 100 });
+                        if (out.length >= 6) break;
+                    }
+                    return out;
+                },
+                toggleWishlist(id) {
+                    if (this.wishlist.includes(id)) {
+                        this.wishlist = this.wishlist.filter(x => x !== id);
+                        this.notify('Dihapus dari Favorit');
+                    } else {
+                        this.wishlist.push(id);
+                        this.notify('Ditambahkan ke Favorit');
+                    }
+                },
+                cartCount() {
+                    return this.cart.reduce((s, c) => s + (Number(c.qty) || 0), 0);
+                },
+                addToCart(product, qty = 1) {
+                    if (product.current_stock < 1) return;
+                    const found = this.cart.find(c => c.id === product.id);
+                    if (found) {
+                        found.qty = Math.min(product.current_stock, found.qty + qty);
+                    } else {
+                        this.cart.push({ ...product, qty });
+                    }
+                    this.notify(product.name + ' masuk ke keranjang');
+                },
+                addBundleToCart(rule) {
+                    const byId = Object.fromEntries(this.data.products.map(p => [p.id, p]));
+                    rule.product_ids.forEach(id => {
+                        if (byId[id]) this.addToCart(byId[id], 1);
+                    });
+                    this.page = 'cart';
+                    this.notify('Paket Bundling ditambahkan — Diskon Smart Bundle aktif!');
+                },
+                cartSubtotal() {
+                    return this.cart.reduce((s, c) => s + c.selling_price * c.qty, 0);
+                },
+                cartBundleCalc() {
+                    const used = {};
+                    const bundles = [];
+                    let discount = 0;
+                    const byId = Object.fromEntries(this.cart.map(c => [c.id, c]));
+                    for (const r of this.data.rules) {
+                        const ids = r.product_ids;
+                        if (ids.length < 2) continue;
+                        if (ids.some(id => !byId[id] || byId[id].qty < 1 || used[id])) continue;
+                        const sets = Math.min(...ids.map(id => byId[id].qty));
+                        const setPrice = ids.reduce((s, id) => s + byId[id].selling_price, 0);
+                        const amt = Math.round(setPrice * sets * r.discount / 100);
+                        ids.forEach(id => used[id] = true);
+                        discount += amt;
+                        bundles.push({ label: r.antecedent_names + ' + ' + r.consequent_names, percent: r.discount, sets, amount: amt });
+                    }
+                    return { discount, bundles };
+                },
+                cartTotal() {
+                    return Math.max(0, this.cartSubtotal() - this.cartBundleCalc().discount);
+                },
+                submitCheckout() {
+                    if (this.cart.length === 0) return;
+                    const inv = 'INV-' + new Date().toISOString().slice(0,10).replace(/-/g,'') + '-' + Math.floor(100 + Math.random()*900);
+                    const total = this.cartTotal();
+                    const disc = this.cartBundleCalc().discount;
+                    this.cart.forEach(item => {
+                        const p = this.data.products.find(x => x.id === item.id);
+                        if (p) p.current_stock = Math.max(0, p.current_stock - item.qty);
+                    });
+                    this.myOrders.unshift({
+                        invoice_number: inv,
+                        date: new Date().toISOString().slice(0,10),
+                        payment_method: this.paymentMethod,
+                        payment_label: this.paymentMethod.toUpperCase(),
+                        order_status: this.paymentMethod === 'cod' ? 'diproses' : 'menunggu_pembayaran',
+                        status_label: this.paymentMethod === 'cod' ? 'Diproses' : 'Menunggu Pembayaran',
+                        discount_amount: disc,
+                        total_amount: total,
+                        shipping_address: this.shippingAddress,
+                    });
+                    this.cart = [];
+                    this.page = 'orders';
+                    this.notify('Pesanan ' + inv + ' berhasil dibuat!');
+                },
+                submitPos() {
+                    if (this.cart.length === 0) return;
+                    this.cart.forEach(item => {
+                        const p = this.data.products.find(x => x.id === item.id);
+                        if (p) p.current_stock = Math.max(0, p.current_stock - item.qty);
+                    });
+                    this.cart = [];
+                    this.notify('Transaksi POS Kasir berhasil disimpan!');
+                },
+                submitRestock() {
+                    const p = this.data.products.find(x => x.id === this.restockProductId);
+                    if (!p) return;
+                    p.current_stock += Number(this.restockQty) || 0;
+                    this.notify('Restock ' + p.name + ' berhasil! Stok kini: ' + p.current_stock);
+                },
+                statusStep(st) {
+                    return ['menunggu_pembayaran','diproses','dikirim','selesai'].indexOf(st);
+                },
+                criticalProducts() {
+                    return this.data.products.filter(p => p.current_stock <= p.min_stock_threshold);
+                },
+                selectedRegProduct() {
+                    return this.data.products.find(p => p.id === this.selectedProductId) || this.data.products[0];
+                },
+                renderRevenueChart() {
+                    const el = document.getElementById('ghRevenueChart');
+                    if (!el) return;
+                    if (this.revChart) this.revChart.destroy();
+                    this.revChart = new Chart(el, {
+                        type: 'bar',
+                        data: {
+                            labels: this.data.months,
+                            datasets: [
+                                { label: 'POS Toko (Rp)', data: this.data.pos_rev_series, backgroundColor: '#1d1d1f', borderRadius: 6 },
+                                { label: 'E-Commerce (Rp)', data: this.data.ecom_rev_series, backgroundColor: '#0071e3', borderRadius: 6 },
+                            ]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } } }
+                    });
+                },
+                renderRegressionChart() {
+                    const el = document.getElementById('ghRegressionChart');
+                    if (!el) return;
+                    const p = this.selectedRegProduct();
+                    if (this.regChart) this.regChart.destroy();
+                    this.regChart = new Chart(el, {
+                        type: 'line',
+                        data: {
+                            labels: [...this.data.months, this.data.target_month + ' (Prediksi)'],
+                            datasets: [
+                                { label: 'Aktual Bulanan (X=1..12)', data: [...p.monthly_actual, null], borderColor: '#1d1d1f', backgroundColor: '#1d1d1f', tension: 0.2 },
+                                { label: 'Garis Regresi OLS & Prediksi Bulan 13', data: [...p.monthly_fitted, p.predicted_demand], borderColor: '#0071e3', backgroundColor: '#0071e3', borderDash: [5,5] }
+                            ]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false }
+                    });
+                },
+                exportCsv() {
+                    const rows = [['SKU','Nama Produk','Kategori','Movement','Harga Jual','Stok','Persamaan OLS','R2','Prediksi Bulan Depan','Saran Restock']];
+                    this.data.products.forEach(p => {
+                        rows.push([p.sku, `"${p.name}"`, `"${p.category}"`, p.movement_type, p.selling_price, p.current_stock, `"${p.equation}"`, p.r_squared, p.predicted_demand, p.restock_recommendation]);
+                    });
+                    const csv = rows.map(r => r.join(',')).join('\n');
+                    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = 'laporan-stok-prediksi-lumenmart.csv';
+                    a.click();
+                }
+            };
+        }
+    </script>
+</body>
+</html>
